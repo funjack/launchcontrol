@@ -89,15 +89,17 @@ func calcSpeed(t time.Duration, prvSpd int) int {
 		rawSpd = 0
 	}
 
-	// Go faster
+	var speed int
 	if rawSpd > prvSpd {
-		return prvSpd + (rawSpd-prvSpd)/6
+		// Go faster
+		speed = prvSpd + (rawSpd-prvSpd)/6
+	} else {
+		// Go slower
+		speed = prvSpd - rawSpd/2
 	}
 
-	// Go slower
-	spd := prvSpd - rawSpd/2
-	if spd < 20 {
+	if speed < 20 {
 		return 20
 	}
-	return spd
+	return speed
 }
