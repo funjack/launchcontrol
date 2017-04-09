@@ -73,10 +73,11 @@ func (es Events) MarshalText() (text []byte, err error) {
 
 // UnmarshalText implements the encoding.TextUnmarshaler interface.
 func (es *Events) UnmarshalText(text []byte) error {
-	size := strings.Count(string(text), ",")
+	t := strings.TrimSpace(string(text))
+	size := strings.Count(t, ",")
 	var events = make([]Event, size+1)
 
-	for i, s := range strings.Split(string(text[1:len(text)-1]), ",") {
+	for i, s := range strings.Split(t[1:len(t)-1], ",") {
 		e := new(Event)
 		err := e.UnmarshalText([]byte(s))
 		if err != nil {
