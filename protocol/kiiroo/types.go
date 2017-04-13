@@ -15,6 +15,11 @@ var (
 	ErrEventFormat = errors.New("invalid event format")
 )
 
+// Algorithm interface converts Kiiroo events into TimedActions.
+type Algorithm interface {
+	Actions(es Events) []TimedAction
+}
+
 // TimedAction wraps Action together with a timestamp.
 type TimedAction struct {
 	protocol.Action

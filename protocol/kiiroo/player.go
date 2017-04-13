@@ -10,12 +10,15 @@ import (
 
 // ScriptPlayer can load and play Kiiroo scripts/subtitles.
 type ScriptPlayer struct {
+	alg    Algorithm
 	script []TimedAction
 }
 
-// NewScriptPlayer returns a new ScriptPlayer.
+// NewScriptPlayer returns a new ScriptPlayer using the default algorithm.
 func NewScriptPlayer() *ScriptPlayer {
-	return new(ScriptPlayer)
+	return &ScriptPlayer{
+		alg: DefaultAlgorithm{},
+	}
 }
 
 // Load reads Kiiroo subtitle/script format.
@@ -28,7 +31,7 @@ func (k *ScriptPlayer) Load(r io.Reader) error {
 	if err != nil {
 		return err
 	}
-	k.script = es.Actions()
+	k.script = k.alg.Actions(es)
 	return nil
 }
 
