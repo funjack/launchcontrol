@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"flag"
 	"log"
@@ -9,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/funjack/golaunch"
 	"github.com/funjack/launchcontrol/protocol/kiiroo"
@@ -37,11 +39,15 @@ func main() {
 	if *noact {
 		l = FakeLaunch("FakeLaunch")
 	} else {
+		ctx, cancel := context.WithTimeout(
+			context.Background(),
+			time.Second*30)
 		la := golaunch.NewLaunch()
 		la.HandleDisconnect(func() {
 			os.Exit(0)
 		})
-		err := la.Connect()
+		err := la.Connect(ctx)
+		cancel()
 		if err != nil {
 			log.Fatal(err)
 		}
