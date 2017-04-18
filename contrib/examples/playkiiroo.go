@@ -22,12 +22,12 @@ var (
 	noact    = flag.Bool("noact", false, "simulate")
 )
 
-type Launch interface {
+type launch interface {
 	Move(position, speed int)
 }
-type FakeLaunch string
+type fakeLaunch string
 
-func (f FakeLaunch) Move(position, speed int) {
+func (f fakeLaunch) Move(position, speed int) {
 	log.Printf("%s: Position=%d, Speed=%d", f, position, speed)
 }
 
@@ -35,9 +35,9 @@ func main() {
 	flag.Parse()
 
 	// Create Launch by connecting to or faking one
-	var l Launch
+	var l launch
 	if *noact {
-		l = FakeLaunch("FakeLaunch")
+		l = fakeLaunch("FakeLaunch")
 	} else {
 		ctx, cancel := context.WithTimeout(
 			context.Background(),
@@ -52,7 +52,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		l = Launch(la)
+		l = launch(la)
 	}
 
 	// Create a Kiiroo script player

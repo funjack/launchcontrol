@@ -17,13 +17,7 @@ var (
 
 // Algorithm interface converts Kiiroo events into TimedActions.
 type Algorithm interface {
-	Actions(es Events) []TimedAction
-}
-
-// TimedAction wraps Action together with a timestamp.
-type TimedAction struct {
-	protocol.Action
-	Time time.Duration
+	Actions(es Events) []protocol.TimedAction
 }
 
 // Event contains the values of a single Kiiroo event.

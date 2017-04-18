@@ -1,23 +1,27 @@
 package kiiroo
 
-import "time"
+import (
+	"time"
+
+	"github.com/funjack/launchcontrol/protocol"
+)
 
 // DefaultAlgorithm implements the Algorithm interface trying to mimik the
 // Kiiroo apps.
 type DefaultAlgorithm struct{}
 
 // Actions converts Kiiroo events into Actions that can be send to a Launch.
-func (da DefaultAlgorithm) Actions(es Events) []TimedAction {
+func (da DefaultAlgorithm) Actions(es Events) []protocol.TimedAction {
 	var (
 		prevEvent           Event
-		prevAction          TimedAction
+		prevAction          protocol.TimedAction
 		actionCount         int
 		position            togglePosition
 		speed, limitedSpeed int
 	)
 
 	// count(actions) <= count(events)
-	actions := make([]TimedAction, len(es))
+	actions := make([]protocol.TimedAction, len(es))
 
 	for _, e := range es {
 		// Move only when value is different from previous event
