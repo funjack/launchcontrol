@@ -3,26 +3,27 @@ package kiiroo
 import (
 	"bytes"
 	"io"
-	"time"
 
 	"github.com/funjack/launchcontrol/protocol"
 )
 
-// ScriptPlayer can load and play Kiiroo scripts/subtitles.
-type ScriptPlayer struct {
-	alg    Algorithm
-	script []TimedAction
+// scriptPlayer can load and play Kiiroo scripts/subtitles.
+type scriptPlayer struct {
+	*protocol.TimedActionsPlayer
+
+	alg Algorithm
 }
 
 // NewScriptPlayer returns a new ScriptPlayer using the default algorithm.
-func NewScriptPlayer() *ScriptPlayer {
-	return &ScriptPlayer{
-		alg: DefaultAlgorithm{},
+func NewScriptPlayer() protocol.SkippableScriptPlayer {
+	return &scriptPlayer{
+		protocol.NewTimedActionsPlayer(),
+		DefaultAlgorithm{},
 	}
 }
 
 // Load reads Kiiroo subtitle/script format.
-func (k *ScriptPlayer) Load(r io.Reader) error {
+func (k *scriptPlayer) Load(r io.Reader) error {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(r)
 
@@ -31,23 +32,7 @@ func (k *ScriptPlayer) Load(r io.Reader) error {
 	if err != nil {
 		return err
 	}
-	k.script = k.alg.Actions(es)
-	return nil
-}
 
-// Play wil start executing the loaded subtitles/script.
-func (k *ScriptPlayer) Play() <-chan protocol.Action {
-	c := make(chan protocol.Action)
-	startTime := time.Now()
-	go func() {
-		for _, a := range k.script {
-			<-time.After(a.Time - time.Now().Sub(startTime))
-			c <- protocol.Action{
-				Position: a.Position,
-				Speed:    a.Speed,
-			}
-		}
-		close(c)
-	}()
-	return c
+	k.Script = k.alg.Actions(es)
+	return nil
 }
