@@ -2,17 +2,31 @@ package protocol
 
 import (
 	"errors"
+	"sync"
 	"time"
 )
 
-var (
-	// ErrPlaying is the error returned when an action is requested that is
-	// not allowed while playing.
-	ErrPlaying = errors.New("action not allowed while playing")
-	// ErrStopped is the error returned when an action is requested that is
-	// not allowed while stopped.
-	ErrStopped = errors.New("action not allowed while stopped")
+// ErrTimeout is the error returned when a requested operation could not be
+// performed in time.
+var ErrTimeout = errors.New("operation timed out")
+
+type command int
+
+const (
+	cmdStop   = iota // stop playback
+	cmdPause         // pause playback
+	cmdResume        // resume playback from paused position
+	cmdSkip          // skip/jump to position
+
+	commandTimeout = time.Second
 )
+
+// control struct is the internal control structure to control the playback
+// loop routine.
+type control struct {
+	Command  command
+	Position time.Duration
+}
 
 // TimedActionsPlayer can playback an array of TimeActions. It can be used by
 // protocols that can pre-calculate TimeActions.
@@ -21,127 +35,137 @@ var (
 // ScriptLoader. Protocols only need to implement ScriptLoader themselves and
 // set the Script field with their result.
 type TimedActionsPlayer struct {
+	// Script that the player will use.
 	Script []TimedAction
 
-	isPlaying      bool
-	cancelPlaying  chan bool
-	stoppedPlaying chan bool
-
-	startPosition time.Duration
-	pausePosition time.Duration
-
-	startTime  time.Time
-	actionChan chan Action
+	wg   sync.WaitGroup
+	ctrl chan control
 }
 
 // NewTimedActionsPlayer returns a new TimedActionsPlayer.
 func NewTimedActionsPlayer() *TimedActionsPlayer {
 	return &TimedActionsPlayer{
-		cancelPlaying:  make(chan bool),
-		stoppedPlaying: make(chan bool),
+		ctrl: make(chan control),
 	}
 }
 
 // Play will start executing the loaded script from the start.
-func (k *TimedActionsPlayer) Play() <-chan Action {
-	return k.PlayFrom(0)
+func (ta *TimedActionsPlayer) Play() <-chan Action {
+	// Only play one script at a time
+	ta.wg.Wait()
+	ta.wg.Add(1)
+	out := make(chan Action)
+	go ta.playbackLoop(out, ta.ctrl)
+	return out
 }
 
-// PlayFrom will start executing the loaded script from the given position.
-func (k *TimedActionsPlayer) PlayFrom(p time.Duration) <-chan Action {
-	if k.isPlaying == true {
-		return k.actionChan
+// sendCommand to the playbackLoop with a timeout.
+func (ta *TimedActionsPlayer) sendCommand(c control) error {
+	select {
+	case ta.ctrl <- c:
+		return nil
+	case <-time.After(commandTimeout):
+		return ErrTimeout
 	}
-
-	k.actionChan = make(chan Action)
-	k.startTime = time.Now()
-	k.startPosition = p
-	go k.startPlaying()
-	return k.actionChan
-}
-
-// Position will return the current position in the script.
-func (k *TimedActionsPlayer) Position() time.Duration {
-	if !k.isPlaying {
-		return k.pausePosition
-	}
-	// Now()+startPosition - startTime
-	return time.Now().Add(k.startPosition).Sub(k.startTime)
 }
 
 // Stop stops playback and resets player.
-func (k *TimedActionsPlayer) Stop() error {
-	if !k.isPlaying {
-		return ErrStopped
-	}
-	k.cancelPlaying <- true
-	<-k.stoppedPlaying
-	k.reset()
-	return nil
+func (ta *TimedActionsPlayer) Stop() error {
+	return ta.sendCommand(control{
+		Command: cmdStop,
+	})
 }
 
-// Pause will stop playback at the current position.
-func (k *TimedActionsPlayer) Pause() error {
-	if !k.isPlaying {
-		return ErrStopped
-	}
-	k.pausePosition = k.Position()
-	k.cancelPlaying <- true
-	<-k.stoppedPlaying
-	return nil
+// Pause will halt playback at the current position.
+func (ta *TimedActionsPlayer) Pause() error {
+	return ta.sendCommand(control{
+		Command: cmdPause,
+	})
 }
 
 // Resume will continue playback from the paused location.
-func (k *TimedActionsPlayer) Resume() error {
-	if k.isPlaying {
-		return ErrPlaying
-	}
-	k.startPosition = k.pausePosition
-	k.startTime = time.Now()
-	go k.startPlaying()
-	return nil
+func (ta *TimedActionsPlayer) Resume() error {
+	return ta.sendCommand(control{
+		Command: cmdResume,
+	})
 }
 
 // Skip will jump to a specific position.
-func (k *TimedActionsPlayer) Skip(p time.Duration) error {
-	if !k.isPlaying {
-		return ErrStopped
-	}
-	k.Pause()
-	k.pausePosition = p
-	k.Resume()
-	return nil
+func (ta *TimedActionsPlayer) Skip(p time.Duration) error {
+	return ta.sendCommand(control{
+		Command:  cmdSkip,
+		Position: p,
+	})
 }
 
-// startPlaying is the actual play loop sending out actions called as a
-// goroutine.
-func (k *TimedActionsPlayer) startPlaying() {
-	k.isPlaying = true
-	for _, a := range k.Script {
-		if a.Time < k.startPosition {
+// playbackLoop will play the loaded script to out and can be controlled using
+// ctrl.
+func (ta *TimedActionsPlayer) playbackLoop(out chan<- Action, ctrl <-chan control) {
+	defer func() {
+		ta.wg.Done()
+		close(out)
+	}()
+
+	var (
+		cursor        int           // event position in script
+		startTime     = time.Now()  // time playback started/resumed
+		startPosition time.Duration // timecode where playback started
+		paused        bool
+	)
+
+	for cursor < len(ta.Script) {
+		a := ta.Script[cursor]
+		if a.Time < startPosition {
+			cursor++
 			continue
 		}
+
+		var nextEventTime <-chan time.Time
+		if !paused {
+			nextEventTime = time.After(
+				a.Time - calcPosition(startTime, startPosition))
+		}
+
 		select {
-		case <-k.cancelPlaying:
-			k.isPlaying = false
-			k.stoppedPlaying <- true
-			return
-		case <-time.After(a.Time - k.Position()):
-			k.actionChan <- Action{
-				Position: a.Position,
-				Speed:    a.Speed,
+		case cmd := <-ctrl:
+			switch cmd.Command {
+			case cmdStop:
+				return
+			case cmdPause:
+				if !paused {
+					paused = true
+					startPosition = calcPosition(
+						startTime,
+						startPosition,
+					)
+				}
+			case cmdResume:
+				if paused {
+					paused = false
+					startTime = time.Now()
+					continue
+				}
+			case cmdSkip:
+				startTime = time.Now()
+				startPosition = cmd.Position
+				cursor = 0
+				continue
+			}
+		case <-nextEventTime:
+			if !paused {
+				out <- Action{
+					Position: a.Position,
+					Speed:    a.Speed,
+				}
+				cursor++
 			}
 		}
+
 	}
-	// end of script reached
-	k.reset()
-	k.isPlaying = false
 }
 
-// reset rewinds the player when playback has finished or is stopped.
-func (k *TimedActionsPlayer) reset() {
-	close(k.actionChan)
-	k.pausePosition = 0 // Be kind rewind
-	k.isPlaying = false
-	k.startTime = time.Time{}
+// calcPosition will return the current timecode in the script based on start
+// time and starting position.
+func calcPosition(startTime time.Time, startPosition time.Duration) time.Duration {
+	return time.Now().Add(startPosition).Sub(startTime)
 }

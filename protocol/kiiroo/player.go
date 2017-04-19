@@ -7,23 +7,23 @@ import (
 	"github.com/funjack/launchcontrol/protocol"
 )
 
-// scriptPlayer can load and play Kiiroo scripts/subtitles.
-type scriptPlayer struct {
+// ScriptPlayer can load and play Kiiroo scripts/subtitles.
+type ScriptPlayer struct {
 	*protocol.TimedActionsPlayer
 
 	alg Algorithm
 }
 
 // NewScriptPlayer returns a new ScriptPlayer using the default algorithm.
-func NewScriptPlayer() protocol.SkippableScriptPlayer {
-	return &scriptPlayer{
+func NewScriptPlayer() *ScriptPlayer {
+	return &ScriptPlayer{
 		protocol.NewTimedActionsPlayer(),
 		DefaultAlgorithm{},
 	}
 }
 
 // Load reads Kiiroo subtitle/script format.
-func (k *scriptPlayer) Load(r io.Reader) error {
+func (k *ScriptPlayer) Load(r io.Reader) error {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(r)
 

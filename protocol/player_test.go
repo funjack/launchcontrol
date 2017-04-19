@@ -134,6 +134,11 @@ func TestSkip(t *testing.T) {
 			At:   time.Millisecond * 50,
 			To:   time.Millisecond * 150,
 		},
+		{
+			Name: "Soon",
+			At:   time.Millisecond * 0,
+			To:   time.Millisecond * 150,
+		},
 	}
 
 	for _, c := range cases {
