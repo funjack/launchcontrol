@@ -78,7 +78,7 @@ func TestPauseResume(t *testing.T) {
 
 	var eventCount int
 	starttime := time.Now()
-	for _ = range p.Play() {
+	for range p.Play() {
 		eventCount++
 	}
 	playTime := time.Now().Sub(starttime)
@@ -107,7 +107,7 @@ func TestStop(t *testing.T) {
 	}()
 
 	starttime := time.Now()
-	for _ = range p.Play() {
+	for range p.Play() {
 		// pass
 	}
 	playTime := time.Now().Sub(starttime)
@@ -148,7 +148,7 @@ func TestSkip(t *testing.T) {
 		}()
 
 		starttime := time.Now()
-		for _ = range p.Play() {
+		for range p.Play() {
 			// pass
 		}
 		playTime := time.Now().Sub(starttime)

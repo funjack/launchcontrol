@@ -15,7 +15,7 @@ var (
 )
 
 // TimedActionsPlayer can playback an array of TimeActions. It can be used by
-// protocols that can pre-caluculate TimeActions.
+// protocols that can pre-calculate TimeActions.
 //
 // All of the SkippableScriptPlayer methods are implemented except for
 // ScriptLoader. Protocols only need to implement ScriptLoader themselves and
