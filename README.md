@@ -13,7 +13,40 @@ The goal is to support multiple haptics protocols/formats.
 See the [gatt docs](https://godoc.org/github.com/currantlabs/gatt#hdr-SETUP)
 for the Bluetooth requirements/setup.
 
-## Examples
+## Build
+
+```sh
+go get ./...
+go build
+sudo setcap 'cap_net_raw,cap_net_admin=eip' ./launchcontrol
+```
+
+To cross-compile for a Raspberry Pi 2 use `GOARCH=arm GOARM=7 go build`.
+
+## Usage
+
+```sh
+# Start server (listening on localhost:6969 by default)
+./launchcontrol
+```
+
+```sh
+# Load and play script
+curl -XPOST --data-ascii "{0.50:1,1.00:4,1.15:0,2.00:2}" \
+	http://localhost:6969/v1/play
+# Pause a playing script
+curl http://localhost:6969/v1/pause
+# Resume paused script
+curl http://localhost:6969/v1/resume
+# Jump to a position in the script
+curl http://localhost:6969/v1/skip\?p=1m3s
+# Stop and reset script
+curl http://localhost:6969/v1/stop
+# Start playing last loaded script
+curl http://localhost:6969/v1/play
+```
+
+## Other examples
 
 ### Build and run example (Linux)
 

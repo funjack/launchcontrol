@@ -24,12 +24,8 @@ type ScriptLoader interface {
 	Load(io.Reader) error
 }
 
-// ScriptPlayer is an interface that has the basic functions to load and play a
-// script. It is supposed to be used to abstract different protocols for the
-// player.
+// ScriptPlayer is an interface that has the basic functions to play a script.
 type ScriptPlayer interface {
-	ScriptLoader
-
 	// Start playback of the loaded script the reader channel should be
 	// attached to a device.
 	Play() <-chan Action

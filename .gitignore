@@ -2,10 +2,17 @@
 *.swo
 *.bak
 
+# test artifacts
+test.txt
+cover.out
+
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o
 *.a
 *.so
+
+playkiiroo
+launchcontrol
 
 # Folders
 _obj
