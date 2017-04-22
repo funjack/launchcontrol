@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/funjack/golaunch"
-	"github.com/funjack/launchcontrol/controller"
+	"github.com/funjack/launchcontrol/action"
 	"github.com/funjack/launchcontrol/manager"
 )
 
@@ -38,7 +38,7 @@ func main() {
 	}
 
 	lm := manager.NewLaunchManager(l)
-	c := controller.NewController(lm)
+	c := action.NewController(lm)
 
 	http.Handle("/v1/play", logger(http.HandlerFunc(c.PlayHandler)))
 	http.Handle("/v1/stop", logger(http.HandlerFunc(c.StopHandler)))

@@ -1,11 +1,12 @@
-package controller
+package action
 
 import (
+	"log"
+	"mime"
 	"net/http"
 	"time"
 
 	"github.com/funjack/launchcontrol/manager"
-	"github.com/funjack/launchcontrol/protocol/kiiroo"
 )
 
 // Controller translates http requests into manager actions.
@@ -23,18 +24,24 @@ func NewController(m *manager.LaunchManager) *Controller {
 // PlayHandler is a http.Handler to load and play scripts.
 func (c *Controller) PlayHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
-		// TODO use a generic script loader service
-		k := kiiroo.NewScriptPlayer()
-		if err := k.Load(r.Body); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+		mediaType, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+		if err != nil {
+			mediaType = ""
+		}
+		k, err := LoadScript(r.Body, mediaType)
+		if err == ErrUnsupported {
+			w.WriteHeader(http.StatusUnsupportedMediaType)
+			return
+		} else if err != nil {
+			log.Printf("Error loading script: %s\n", err)
+			internalServerError(w)
 			return
 		}
 		if err := c.manager.SetScriptPlayer(k); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			handleManagerError(w, err)
 			return
 		}
 	}
-
 	handleManagerError(w, c.manager.Play())
 }
 
@@ -64,7 +71,6 @@ func (c *Controller) SkipHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
 	handleManagerError(w, c.manager.Skip(p))
 }
 
@@ -81,7 +87,13 @@ func handleManagerError(w http.ResponseWriter, err error) {
 		w.WriteHeader(http.StatusConflict)
 		w.Write([]byte("operation cannot be executed when not playing\n"))
 	default:
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("internal server error\n"))
+		log.Printf("Internal server error, %s\n", err)
+		internalServerError(w)
 	}
+}
+
+// internalServerError returns a status 500 with message to a ResponseWriter.
+func internalServerError(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusInternalServerError)
+	w.Write([]byte("internal server error\n"))
 }
