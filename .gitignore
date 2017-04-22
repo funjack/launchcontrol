@@ -10,9 +10,11 @@ cover.out
 *.o
 *.a
 *.so
+*.pyc
 
 playkiiroo
 launchcontrol
+contrib/kodi/*.zip
 
 # Folders
 _obj
