@@ -1,4 +1,4 @@
-# Launchcontrol (work in progress)
+# Launchcontrol (Alpha)
 
 [![GoDoc](https://godoc.org/github.com/funjack/launchcontrol?status.svg)](https://godoc.org/github.com/funjack/launchcontrol)
 [![Go Report Card](https://goreportcard.com/badge/github.com/funjack/launchcontrol)](https://goreportcard.com/report/github.com/funjack/launchcontrol)
@@ -6,12 +6,11 @@
 Launchcontrol is a server that can control a Launch, and is meant to be used
 with a plugin for an external player (eg Kodi or VLC)
 
-The goal is to support multiple haptics protocols/formats.
+Currently only Kiiroo scripts work, but the goal is to support multiple haptics
+protocols/formats.
 
-## Setup
-
-See the [gatt docs](https://godoc.org/github.com/currantlabs/gatt#hdr-SETUP)
-for the Bluetooth requirements/setup.
+Made for Linux but should also work on a Mac. Also works great on a Raspberry
+Pi with for example [LibreElec](https://libreelec.tv/).
 
 ## Build
 
@@ -21,7 +20,7 @@ go build
 sudo setcap 'cap_net_raw,cap_net_admin=eip' ./launchcontrol
 ```
 
-To cross-compile for a Raspberry Pi 2 use `GOARCH=arm GOARM=7 go build`.
+To cross-compile for a Raspberry Pi 2/3 use `GOARCH=arm GOARM=7 go build`.
 
 ## Usage
 
@@ -45,6 +44,40 @@ curl http://localhost:6969/v1/stop
 # Start playing last loaded script
 curl http://localhost:6969/v1/play
 ```
+
+## Kodi Integration
+
+The Launchcontrol Kodi service addon connects to a local Launchserver and auto
+loads scripts and synchronizes playback, taking into account actions like
+pausing and seeking.
+
+Scripts that are paired with the movie file will be loaded. Pairing is done by
+placing a script file next a movie using the same base filename (this mirrors
+the same convention as for [nfo](http://kodi.wiki/view/NFO_files) or artwork).
+The addon uses Kodi's VFS while searching and loading scripts, so even movies
+on remote sources like SMB or HTTP servers will work.
+
+**Movie/script pairing example:**
+
+- `/my movies/title.mp4`
+- `/my movies/title.kiiroo`
+
+### Install
+
+The plugin is located in `contrib/kodi/script.service.launchcontrol`. Just zip
+up the directory (or use the Makefile.) This
+[guide](http://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files) shows how
+to install the zip file in Kodi. After installation the plugin will
+automatically start.
+
+**NOTE** Unless you customize the addon yourself, Launchcontrol must be running
+on the same host and listening on the default port 6969 in order for the plugin
+to work.
+
+## Bluetooth requirements
+
+See the [gatt docs](https://godoc.org/github.com/currantlabs/gatt#hdr-SETUP)
+for the Bluetooth requirements/setup.
 
 ## Other examples
 
