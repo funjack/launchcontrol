@@ -12,8 +12,17 @@ class PlayerMonitor(xbmc.Player) :
     """PlayerMonitor sends launch commands based on Player events."""
 
     def __init__(self):
-        self._launch = launchcontrol.Client()
+        self.loadConfig()
         xbmc.Player.__init__(self)
+
+    def loadConfig(self):
+        """loadConfig configures the monitor with the Kodi addon settings."""
+        self._launch = launchcontrol.Client(
+                url=__addon__.getSetting("address"),
+                positionmin=__addon__.getSetting("positionmin"),
+                positionmax=__addon__.getSetting("positionmax"),
+                speedmin=__addon__.getSetting("speedmin"),
+                speedmax=__addon__.getSetting("speedmax"))
 
     def onPlayBackStarted(self):
         try:
@@ -137,6 +146,16 @@ def ReadScript(filename):
             return (data, scripttype["mediaType"])
     return ("","")
 
+class SettingsMonitor(xbmc.Monitor):
+    """SettingsMonitor reloads the player monitors config when the addon settigs change."""
+
+    def __init__(self, player):
+        self._player = player
+        xbmc.Monitor.__init__(self)
+
+    def onSettingsChanged(self):
+        self._player.loadConfig()
+
 def log(txt, level=xbmc.LOGDEBUG):
     """Log to the XBMC/Kodi logfile.
     
@@ -148,17 +167,15 @@ def log(txt, level=xbmc.LOGDEBUG):
     xbmc.log(msg=message, level=level)
 
 if __name__ == '__main__':
-    log('Script %s version %s started' % (__addonname__, __addonversion__),
-            xbmc.LOGNOTICE)
+    log('Version %s started' % __addonversion__, xbmc.LOGNOTICE)
     # FIXME: sometimes the addon cannot be uninstalled, it seems the
     # PlayerMonitor can't always be stopped after it has been used. A Kodi
     # restart is then required. :-(
     player = PlayerMonitor()
-    monitor = xbmc.Monitor()
+    monitor = SettingsMonitor(player)
     while not monitor.abortRequested():
         if monitor.waitForAbort(10):
             break
     del monitor
     del player
-    log('Script %s version %s stopped' % (__addonname__, __addonversion__),
-            xbmc.LOGNOTICE)
+    log('Version %s stopped' % __addonversion__, xbmc.LOGNOTICE)

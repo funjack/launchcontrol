@@ -34,10 +34,23 @@ class NotSupportedException(Exception):
     """Raise when the specified type is not supported"""
 
 class Client() :
-    """Client communicates with a Launchcontrol server."""
+    """Client communicates with a Launchcontrol server.
 
-    def __init__ (self, url="http://127.0.0.1:6969"):
+    Args:
+        url: Launchcontrol server url
+        positionmin: Lowest position in percent the Launch should move to
+        positionmax: Highest position in percent the Launch should move to
+        speedmin: Slowest speed in percent the Launch should move at
+        speedmax: Highest speed in percent the Launch should move to
+    """
+
+    def __init__ (self, url="http://127.0.0.1:6969",
+            positionmin=0, positionmax=100, speedmin=20, speedmax=100):
         self._url = url
+        self.positionMin = int(positionmin)
+        self.positionMax = int(positionmax)
+        self.speedMin = int(speedmin)
+        self.speedMax = int(speedmax)
 
     def Play(self, data, mediaType):
         """Play by sending data as specified mediatype.
@@ -51,7 +64,11 @@ class Client() :
                 supported.
         """
         if mediaType != "":
-            req = urllib2.Request(self._url+'/v1/play',
+            params = [ "positionmin=%d" % self.positionMin,
+                    "positionmax=%d" % self.positionMax,
+                    "speedmin=%d" % self.speedMin,
+                    "speedmax=%d" % self.speedMax ]
+            req = urllib2.Request(self._url+'/v1/play?%s' % "&".join(params),
                     data=data, headers={'Content-Type': mediaType})
             try:
                 r = urllib2.urlopen(req)

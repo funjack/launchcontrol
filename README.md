@@ -3,6 +3,8 @@
 [![GoDoc](https://godoc.org/github.com/funjack/launchcontrol?status.svg)](https://godoc.org/github.com/funjack/launchcontrol)
 [![Go Report Card](https://goreportcard.com/badge/github.com/funjack/launchcontrol)](https://goreportcard.com/report/github.com/funjack/launchcontrol)
 
+![Launchcontrol logo](contrib/kodi/script.service.launchcontrol/icon.png "Launchcontrol")
+
 Launchcontrol is a server that can control a Launch, and is meant to be used
 with a plugin for an external player (eg Kodi or VLC)
 
@@ -70,9 +72,9 @@ up the directory (or use the Makefile.) This
 to install the zip file in Kodi. After installation the plugin will
 automatically start.
 
-**NOTE** Unless you customize the addon yourself, Launchcontrol must be running
-on the same host and listening on the default port 6969 in order for the plugin
-to work.
+**NOTE** If you are running Launchcontrol on another machine then Kodi or
+are not using the default port, the address can be changed in the add-ons
+`configure` menu.
 
 ## Bluetooth requirements
 
