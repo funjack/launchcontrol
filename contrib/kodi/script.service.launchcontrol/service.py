@@ -19,6 +19,7 @@ class PlayerMonitor(xbmc.Player) :
         """loadConfig configures the monitor with the Kodi addon settings."""
         self._launch = launchcontrol.Client(
                 url=__addon__.getSetting("address"),
+                latency=__addon__.getSetting("latency"),
                 positionmin=__addon__.getSetting("positionmin"),
                 positionmax=__addon__.getSetting("positionmax"),
                 speedmin=__addon__.getSetting("speedmin"),
@@ -35,11 +36,13 @@ class PlayerMonitor(xbmc.Player) :
                 # where playback is resumed, and it takes a while for the
                 # player to actually update getTime to the resumed location.
                 waitTimeSec = 1
-                firstReadTime = self.getTime()
-                xbmc.sleep(waitTimeSec*1000)
-                # Skip if the difference is larger then a second.
-                if round(self.getTime()) > round(firstReadTime+waitTimeSec):
-                    self.SkipToCurrentTime()
+                for i in xrange(3):
+                    eventTime = self.getTime()
+                    xbmc.sleep(waitTimeSec*1000)
+                    # Skip if the difference is larger then waitTimeSec
+                    if round(self.getTime()) > round(eventTime+waitTimeSec*i):
+                        self.SkipToCurrentTime()
+                        break
         except launchcontrol.NotNowException:
             pass
         except launchcontrol.NotSupportedException:

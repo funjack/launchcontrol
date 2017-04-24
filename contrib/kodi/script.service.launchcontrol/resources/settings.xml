@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
     <category label="32001">
-        <setting label="32002" type="text"   id="address" default="http://127.0.0.1:6969"/>
         <setting label="32003" type="lsep"/>
         <setting label="32004" type="slider" id="positionmin" default="0" range="0,5,100" option="int" />
         <setting label="32005" type="slider" id="positionmax" default="100" range="0,5,100" option="int" />
         <setting label="32006" type="lsep"/>
         <setting label="32007" type="slider" id="speedmin" default="20" range="20,5,100" option="int" />
         <setting label="32008" type="slider" id="speedmax" default="100" range="20,5,100" option="int" />
+    </category>
+    <category label="32002">
+        <setting label="32009" type="text"   id="address" default="http://127.0.0.1:6969"/>
+        <setting label="32010" type="slider" id="latency" default="0" range="-1000,10,1000" option="int" />
     </category>
 </settings>

@@ -17,15 +17,15 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgctxt "#32001"
-msgid "General"
+msgid "Personalize"
 msgstr ""
 
 msgctxt "#32002"
-msgid "Address"
+msgid "Connection"
 msgstr ""
 
 msgctxt "#32003"
-msgid "Position"
+msgid "Position boundries"
 msgstr ""
 
 msgctxt "#32004"
@@ -37,7 +37,7 @@ msgid "Highest"
 msgstr ""
 
 msgctxt "#32006"
-msgid "Speed"
+msgid "Speed limits"
 msgstr ""
 
 msgctxt "#32007"
@@ -46,4 +46,12 @@ msgstr ""
 
 msgctxt "#32008"
 msgid "Fastest"
+msgstr ""
+
+msgctxt "#32009"
+msgid "Address"
+msgstr ""
+
+msgctxt "#32010"
+msgid "Latency (ms)"
 msgstr ""

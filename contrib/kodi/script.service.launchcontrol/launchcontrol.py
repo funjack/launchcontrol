@@ -38,15 +38,17 @@ class Client() :
 
     Args:
         url: Launchcontrol server url
+        latency: Time adjustment in milliseconds
         positionmin: Lowest position in percent the Launch should move to
         positionmax: Highest position in percent the Launch should move to
         speedmin: Slowest speed in percent the Launch should move at
         speedmax: Highest speed in percent the Launch should move to
     """
 
-    def __init__ (self, url="http://127.0.0.1:6969",
+    def __init__ (self, url="http://127.0.0.1:6969", latency=0,
             positionmin=0, positionmax=100, speedmin=20, speedmax=100):
         self._url = url
+        self.latency = int(latency)
         self.positionMin = int(positionmin)
         self.positionMax = int(positionmax)
         self.speedMin = int(speedmin)
@@ -64,7 +66,8 @@ class Client() :
                 supported.
         """
         if mediaType != "":
-            params = [ "positionmin=%d" % self.positionMin,
+            params = [ "latency=%d" % self.latency,
+                    "positionmin=%d" % self.positionMin,
                     "positionmax=%d" % self.positionMax,
                     "speedmin=%d" % self.speedMin,
                     "speedmax=%d" % self.speedMax ]
