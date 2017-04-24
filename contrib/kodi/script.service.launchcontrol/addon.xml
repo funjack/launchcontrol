@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="script.service.launchcontrol" version="0.0.1" name="Launchcontrol Service" provider-name="Funjack">
-<requires>
-  <import addon="xbmc.python" version="2.24.0"/>
-</requires>
-<extension point="xbmc.service" library="service.py" start="login" />
-<extension point="xbmc.addon.metadata">
-  <platform>all</platform>
-  <license>BSD 3-Clause License</license>
-  <summary lang="en">Interface between Kodi and a Launchcontrol.</summary>
-  <description lang="en">Service that will detect scripts and load them into a local Launchcontrol server. Plays the script based on Player position and react on events like pausing and seeking.</description> 
-  <website>https://github.com/funjack/launchcontrol</website>
-  <source>https://github.com/funjack/launchcontrol/tree/master/contrib/kodi/script.service.launchcontrol</source>
-</extension>
+<addon id="script.service.launchcontrol" version="0.0.3" name="Launchcontrol" provider-name="Funjack">
+  <requires>
+    <import addon="xbmc.python" version="2.24.0"/>
+  </requires>
+  <extension point="xbmc.python.script" library="actions.py" />
+  <extension point="xbmc.service" library="service.py" start="login" />
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <license>BSD 3-Clause License</license>
+    <summary lang="en">Interface between Kodi and a Launchcontrol.</summary>
+    <description lang="en">Service that will scan for haptic scripts on playback. The haptics will be loaded into a Launchcontrol server and played in sync. Action like pausing playback or seeking to a new position are relayed to the Launchcontrol server.</description>
+    <website>https://github.com/funjack/launchcontrol</website>
+    <source>https://github.com/funjack/launchcontrol/tree/master/contrib/kodi/script.service.launchcontrol</source>
+    <assets>
+      <icon>icon.png</icon>
+      <screenshot>resources/screenshot001.jpg</screenshot>
+      <screenshot>resources/screenshot002.jpg</screenshot>
+    </assets>
+  </extension>
 </addon>
