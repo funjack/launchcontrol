@@ -11,8 +11,10 @@ with a plugin for an external player (eg Kodi or VLC)
 Currently only Kiiroo scripts work, but the goal is to support multiple haptics
 protocols/formats.
 
-Made for Linux but should also work on a Mac. Also works great on a Raspberry
-Pi with for example [LibreElec](https://libreelec.tv/).
+Made for Linux but should also work on a Mac. Works great on a Raspberry
+Pi [LibreELEC](https://libreelec.tv/).
+
+Requires a Launch with firmware 1.2.
 
 ## Build
 
@@ -21,8 +23,6 @@ go get ./...
 go build
 sudo setcap 'cap_net_raw,cap_net_admin=eip' ./launchcontrol
 ```
-
-To cross-compile for a Raspberry Pi 2/3 use `GOARCH=arm GOARM=7 go build`.
 
 ## Usage
 
@@ -72,9 +72,42 @@ up the directory (or use the Makefile.) This
 to install the zip file in Kodi. After installation the plugin will
 automatically start.
 
-**NOTE** If you are running Launchcontrol on another machine then Kodi or
+**NOTE:** If you are running Launchcontrol on another machine then Kodi or
 are not using the default port, the address can be changed in the add-ons
 `configure` menu.
+
+### Raspberry Pi v2/v3 with LibreELEC
+
+Make sure Bluetooth is **disabled** in the LibreELEC
+[Services](https://wiki.libreelec.tv/index.php?title=LibreELEC_Settings#tab=Services)
+tab.
+
+Build Launchserver for [arm](https://golang.org/doc/install/source#environment):
+```sh
+go get ./...
+GOARCH=arm GOARM=7 go build
+```
+
+Build the script addon:
+```sh
+make -C contrib/kodi/
+```
+
+Copy the build results and an [autostart.sh](http://wiki.openelec.tv/index.php/Autostart.sh) to the Raspberry Pi:
+```sh
+ssh root@libreelec 'mkdir /storage/launchcontrol'
+scp launchcontrol root@libreelec:/storage/launchcontrol/
+scp contrib/kodi/autostart.sh root@libreelec:/storage/.config/
+scp contrib/kodi/script.service.launchcontrol.zip root@libreelec:/storage/
+```
+
+Reboot LibreELEC and
+[install](http://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files) the
+`script.service.launchcontrol.zip` addon.
+
+Thats it!
+
+![Personalize screenshot](contrib/kodi/script.service.launchcontrol/resources/screenshot001.jpg "Personalize")
 
 ## Bluetooth requirements
 
