@@ -33,6 +33,21 @@ func (f LoaderFunc) Load(r io.Reader) (Player, error) {
 	return f(r)
 }
 
+// PositionLimiter wraps the limitposition method.
+type PositionLimiter interface {
+	LimitPosition(lowest, highest int)
+}
+
+// SpeedLimiter wraps the limitposition method.
+type SpeedLimiter interface {
+	LimitSpeed(slowest, fastest int)
+}
+
+// LatencyCalibrator wraps the Latency method.
+type LatencyCalibrator interface {
+	Latency(t time.Duration)
+}
+
 // Player is an interface that has the basic functions to play a script.
 type Player interface {
 	// Start playback of the loaded script the reader channel should be
