@@ -28,7 +28,7 @@ type LaunchManager struct {
 	sync.Mutex
 
 	launch golaunch.Launch
-	player protocol.ScriptPlayer
+	player protocol.Player
 
 	isPlaying   bool
 	isConnected bool
@@ -54,7 +54,7 @@ func NewLaunchManager(l golaunch.Launch) *LaunchManager {
 
 // SetScriptPlayer switches the active ScriptPlayer. Any active script will be
 // stopped.
-func (m *LaunchManager) SetScriptPlayer(p protocol.ScriptPlayer) error {
+func (m *LaunchManager) SetScriptPlayer(p protocol.Player) error {
 	m.Lock()
 	defer m.Unlock()
 
@@ -128,7 +128,7 @@ func (m *LaunchManager) Pause() error {
 	defer m.Unlock()
 
 	if m.isPlaying {
-		if pp, ok := m.player.(protocol.PausableScriptPlayer); ok {
+		if pp, ok := m.player.(protocol.Pausable); ok {
 			return pp.Pause()
 		}
 		return ErrNotSupported
@@ -142,7 +142,7 @@ func (m *LaunchManager) Resume() error {
 	defer m.Unlock()
 
 	if m.isPlaying {
-		if pp, ok := m.player.(protocol.PausableScriptPlayer); ok {
+		if pp, ok := m.player.(protocol.Pausable); ok {
 			return pp.Resume()
 		}
 		return ErrNotSupported
@@ -156,7 +156,7 @@ func (m *LaunchManager) Skip(p time.Duration) error {
 	defer m.Unlock()
 
 	if m.isPlaying {
-		if pp, ok := m.player.(protocol.SkippableScriptPlayer); ok {
+		if pp, ok := m.player.(protocol.Skippable); ok {
 			return pp.Skip(p)
 		}
 		return ErrNotSupported

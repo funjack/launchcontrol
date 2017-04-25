@@ -14,7 +14,7 @@ import (
 // Loaders contains all the registered ScriptLoaders.
 var Loaders = []Loader{
 	{
-		Loader: kiiroo.NewScriptPlayer(),
+		Loader: protocol.LoaderFunc(kiiroo.Load),
 		ContentTypes: []string{
 			"x-text/kiiroo",
 			"text/plain",
@@ -30,7 +30,7 @@ var ErrUnsupported = errors.New("unsupported script")
 
 // Loader wraps a scriptloader with it's supported mediatypes.
 type Loader struct {
-	Loader       protocol.ScriptLoader
+	Loader       protocol.Loader
 	ContentTypes []string
 }
 
@@ -47,8 +47,8 @@ func (l Loader) IsSupported(contentType string) bool {
 // LoadScript tries to load specified script with all ScriptPlayers and returns
 // the first one that's succesfull.
 // Loaders that are tried can be filtered by specifying the content type.
-func LoadScript(r io.Reader, contentType string) (protocol.ScriptPlayer, error) {
-	supportedLoaders := make([]protocol.ScriptLoader, 0, len(Loaders))
+func LoadScript(r io.Reader, contentType string) (protocol.Player, error) {
+	supportedLoaders := make([]protocol.Loader, 0, len(Loaders))
 	for _, s := range Loaders {
 		if contentType == "" || s.IsSupported(contentType) {
 			supportedLoaders = append(supportedLoaders, s.Loader)
@@ -73,14 +73,10 @@ func LoadScript(r io.Reader, contentType string) (protocol.ScriptPlayer, error) 
 
 // load will try to load the content of r with scriptloader l and return it's
 // player.
-func load(l protocol.ScriptLoader, r io.Reader) (protocol.ScriptPlayer, error) {
-	err := l.Load(r)
+func load(l protocol.Loader, r io.Reader) (protocol.Player, error) {
+	p, err := l.Load(r)
 	if err != nil {
 		return nil, err
 	}
-
-	if sp, ok := l.(protocol.ScriptPlayer); ok {
-		return sp, nil
-	}
-	return nil, ErrUnsupported
+	return p, nil
 }
