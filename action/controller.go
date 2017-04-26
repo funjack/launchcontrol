@@ -4,6 +4,8 @@ import (
 	"log"
 	"mime"
 	"net/http"
+	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/funjack/launchcontrol/manager"
@@ -24,11 +26,12 @@ func NewController(m *manager.LaunchManager) *Controller {
 // PlayHandler is a http.Handler to load and play scripts.
 func (c *Controller) PlayHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
+		pers := parsePlayParams(r.URL.Query())
 		mediaType, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 		if err != nil {
 			mediaType = ""
 		}
-		k, err := LoadScript(r.Body, mediaType)
+		k, err := LoadScript(r.Body, mediaType, pers)
 		if err == ErrUnsupported {
 			w.WriteHeader(http.StatusUnsupportedMediaType)
 			return
@@ -96,4 +99,25 @@ func handleManagerError(w http.ResponseWriter, err error) {
 func internalServerError(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte("internal server error\n"))
+}
+
+// parsePlayParams extracts personalization values from the query params.
+func parsePlayParams(q url.Values) Personalization {
+	p := NewPersonalization()
+	if i, err := strconv.Atoi(q.Get("latency")); err == nil {
+		p.Latency = time.Duration(i) * time.Millisecond
+	}
+	if i, err := strconv.Atoi(q.Get("positionmin")); err == nil {
+		p.PositionMin = i
+	}
+	if i, err := strconv.Atoi(q.Get("positionmax")); err == nil {
+		p.PositionMax = i
+	}
+	if i, err := strconv.Atoi(q.Get("speedmin")); err == nil {
+		p.SpeedMin = i
+	}
+	if i, err := strconv.Atoi(q.Get("speedmax")); err == nil {
+		p.SpeedMax = i
+	}
+	return p
 }

@@ -18,14 +18,38 @@ type TimedAction struct {
 	Time time.Duration
 }
 
-// ScriptLoader is the interface that wraps the Load method.
-type ScriptLoader interface {
+// Loader is the interface that wraps the Load method.
+type Loader interface {
 	// Load a script from the provided reader.
-	Load(io.Reader) error
+	Load(r io.Reader) (p Player, err error)
 }
 
-// ScriptPlayer is an interface that has the basic functions to play a script.
-type ScriptPlayer interface {
+// LoaderFunc type is an adapter to allow the use of ordinary functions as
+// script loader.
+type LoaderFunc func(io.Reader) (Player, error)
+
+// Load calls f(r)
+func (f LoaderFunc) Load(r io.Reader) (Player, error) {
+	return f(r)
+}
+
+// PositionLimiter wraps the limitposition method.
+type PositionLimiter interface {
+	LimitPosition(lowest, highest int)
+}
+
+// SpeedLimiter wraps the limitposition method.
+type SpeedLimiter interface {
+	LimitSpeed(slowest, fastest int)
+}
+
+// LatencyCalibrator wraps the Latency method.
+type LatencyCalibrator interface {
+	Latency(t time.Duration)
+}
+
+// Player is an interface that has the basic functions to play a script.
+type Player interface {
 	// Start playback of the loaded script the reader channel should be
 	// attached to a device.
 	Play() <-chan Action
@@ -34,21 +58,16 @@ type ScriptPlayer interface {
 	Stop() error
 }
 
-// PausableScriptPlayer is a ScriptPlayer that can be paused and resumed.
-type PausableScriptPlayer interface {
-	ScriptPlayer
-
+// Pausable is a interface that defines the pause and resume actions.
+type Pausable interface {
 	// Pause playback.
 	Pause() error
 	// Resume playback from the current position.
 	Resume() error
 }
 
-// SkippableScriptPlayer is a PausableScriptPlayer that can jump to a time
-// location.
-type SkippableScriptPlayer interface {
-	PausableScriptPlayer
-
+// Skippable is a interface that wraps the skip method.
+type Skippable interface {
 	// Skip (jump) to the specified position/timecode.
 	Skip(position time.Duration) error
 }

@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"strings"
+	"time"
 
 	"github.com/funjack/launchcontrol/protocol"
 	"github.com/funjack/launchcontrol/protocol/kiiroo"
@@ -14,7 +15,7 @@ import (
 // Loaders contains all the registered ScriptLoaders.
 var Loaders = []Loader{
 	{
-		Loader: kiiroo.NewScriptPlayer(),
+		Loader: protocol.LoaderFunc(kiiroo.Load),
 		ContentTypes: []string{
 			"x-text/kiiroo",
 			"text/plain",
@@ -28,9 +29,29 @@ var Loaders = []Loader{
 // scriptplayer.
 var ErrUnsupported = errors.New("unsupported script")
 
+// Personalization are settings customizing a scripts behaviour
+type Personalization struct {
+	Latency     time.Duration
+	PositionMin int // Lowest position
+	PositionMax int // Highest position
+	SpeedMin    int // Slowest speed to move at
+	SpeedMax    int // Fastest speed to move at
+}
+
+// NewPersonalization return a Personalization with the default values.
+func NewPersonalization() Personalization {
+	return Personalization{
+		Latency:     0,
+		PositionMin: 5,
+		PositionMax: 95,
+		SpeedMin:    20,
+		SpeedMax:    80,
+	}
+}
+
 // Loader wraps a scriptloader with it's supported mediatypes.
 type Loader struct {
-	Loader       protocol.ScriptLoader
+	Loader       protocol.Loader
 	ContentTypes []string
 }
 
@@ -47,8 +68,8 @@ func (l Loader) IsSupported(contentType string) bool {
 // LoadScript tries to load specified script with all ScriptPlayers and returns
 // the first one that's succesfull.
 // Loaders that are tried can be filtered by specifying the content type.
-func LoadScript(r io.Reader, contentType string) (protocol.ScriptPlayer, error) {
-	supportedLoaders := make([]protocol.ScriptLoader, 0, len(Loaders))
+func LoadScript(r io.Reader, contentType string, p Personalization) (protocol.Player, error) {
+	supportedLoaders := make([]protocol.Loader, 0, len(Loaders))
 	for _, s := range Loaders {
 		if contentType == "" || s.IsSupported(contentType) {
 			supportedLoaders = append(supportedLoaders, s.Loader)
@@ -56,7 +77,7 @@ func LoadScript(r io.Reader, contentType string) (protocol.ScriptPlayer, error) 
 	}
 	// Just pass the reader if there is only one supported loader.
 	if len(supportedLoaders) == 1 {
-		return load(supportedLoaders[0], r)
+		return load(supportedLoaders[0], r, p)
 	}
 	// Make a copy of the readers contents to be used multiple times.
 	data, err := ioutil.ReadAll(r)
@@ -64,7 +85,7 @@ func LoadScript(r io.Reader, contentType string) (protocol.ScriptPlayer, error) 
 		return nil, err
 	}
 	for _, loader := range supportedLoaders {
-		if sp, err := load(loader, bytes.NewBuffer(data)); err == nil {
+		if sp, err := load(loader, bytes.NewBuffer(data), p); err == nil {
 			return sp, nil
 		}
 	}
@@ -73,14 +94,37 @@ func LoadScript(r io.Reader, contentType string) (protocol.ScriptPlayer, error) 
 
 // load will try to load the content of r with scriptloader l and return it's
 // player.
-func load(l protocol.ScriptLoader, r io.Reader) (protocol.ScriptPlayer, error) {
-	err := l.Load(r)
+func load(l protocol.Loader, r io.Reader, pers Personalization) (protocol.Player, error) {
+	personalizeLoader(l, pers)
+	p, err := l.Load(r)
 	if err != nil {
 		return nil, err
 	}
+	personalizePlayer(p, pers)
+	return p, nil
+}
 
-	if sp, ok := l.(protocol.ScriptPlayer); ok {
-		return sp, nil
+// personalizeLoader will apply, if supported, personalized position and speed
+// limits to the loader.
+func personalizeLoader(l protocol.Loader, pers Personalization) {
+	if pl, ok := l.(protocol.PositionLimiter); ok {
+		pl.LimitPosition(pers.PositionMin, pers.PositionMax)
 	}
-	return nil, ErrUnsupported
+	if sl, ok := l.(protocol.SpeedLimiter); ok {
+		sl.LimitSpeed(pers.SpeedMin, pers.SpeedMax)
+	}
+}
+
+// personalizePlayer will apply, if supported, personalized latency, position
+// and speed limits to the loader.
+func personalizePlayer(p protocol.Player, pers Personalization) {
+	if lc, ok := p.(protocol.LatencyCalibrator); ok {
+		lc.Latency(pers.Latency)
+	}
+	if pl, ok := p.(protocol.PositionLimiter); ok {
+		pl.LimitPosition(pers.PositionMin, pers.PositionMax)
+	}
+	if sl, ok := p.(protocol.SpeedLimiter); ok {
+		sl.LimitSpeed(pers.SpeedMin, pers.SpeedMax)
+	}
 }
