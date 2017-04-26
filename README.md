@@ -2,6 +2,8 @@
 
 [![GoDoc](https://godoc.org/github.com/funjack/launchcontrol?status.svg)](https://godoc.org/github.com/funjack/launchcontrol)
 [![Go Report Card](https://goreportcard.com/badge/github.com/funjack/launchcontrol)](https://goreportcard.com/report/github.com/funjack/launchcontrol)
+[![Build Status](https://travis-ci.org/funjack/launchcontrol.svg?branch=master)](https://travis-ci.org/funjack/launchcontrol)
+[![codecov.io](https://codecov.io/github/funjack/launchcontrol/coverage.svg?branch=master)](https://codecov.io/github/funjack/launchcontrol)
 
 ![Launchcontrol logo](contrib/kodi/script.service.launchcontrol/icon.png "Launchcontrol")
 
