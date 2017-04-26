@@ -40,12 +40,18 @@ type TimedActionsPlayer struct {
 
 	wg   sync.WaitGroup
 	ctrl chan control
+
+	latency        time.Duration
+	posLimitFunc   func(int) int
+	speedLimitFunc func(int) int
 }
 
 // NewTimedActionsPlayer returns a new TimedActionsPlayer.
 func NewTimedActionsPlayer() *TimedActionsPlayer {
 	return &TimedActionsPlayer{
-		ctrl: make(chan control),
+		ctrl:           make(chan control),
+		posLimitFunc:   func(p int) int { return p },
+		speedLimitFunc: func(s int) int { return s },
 	}
 }
 
@@ -57,6 +63,49 @@ func (ta *TimedActionsPlayer) Play() <-chan Action {
 	out := make(chan Action)
 	go ta.playbackLoop(out, ta.ctrl)
 	return out
+}
+
+// Latency implements the LatencyCalibrator interface to calibrate the latency.
+func (ta *TimedActionsPlayer) Latency(t time.Duration) {
+	ta.latency = t
+}
+
+// LimitPosition implements the PositionLimiter interface.
+// low is the lowest position in percent to move to.
+// high is the highst position in percent to move to.
+func (ta *TimedActionsPlayer) LimitPosition(low, high int) {
+	if low >= high || high <= low {
+		// Ignore invalid config
+		return
+	}
+	ta.posLimitFunc = func(p int) int {
+		if p < low {
+			return low
+		}
+		if p > high {
+			return high
+		}
+		return p
+	}
+}
+
+// LimitSpeed implements the SpeedLimiter interface.
+// slow is the slowest speed in percent to move with.
+// fast is the highst speed in percent to move with.
+func (ta *TimedActionsPlayer) LimitSpeed(slow, fast int) {
+	if slow >= fast || fast <= slow {
+		// Ignore invalid config
+		return
+	}
+	ta.posLimitFunc = func(s int) int {
+		if s < slow {
+			return slow
+		}
+		if s > fast {
+			return fast
+		}
+		return s
+	}
 }
 
 // sendCommand to the playbackLoop with a timeout.
@@ -123,7 +172,7 @@ func (ta *TimedActionsPlayer) playbackLoop(out chan<- Action, ctrl <-chan contro
 		var nextEventTime <-chan time.Time
 		if !paused {
 			nextEventTime = time.After(
-				a.Time - calcPosition(startTime, startPosition))
+				a.Time - calcPosition(startTime, startPosition) + ta.latency)
 		}
 
 		select {
@@ -137,7 +186,7 @@ func (ta *TimedActionsPlayer) playbackLoop(out chan<- Action, ctrl <-chan contro
 					startPosition = calcPosition(
 						startTime,
 						startPosition,
-					)
+					) + ta.latency
 				}
 			case cmdResume:
 				if paused {
@@ -154,8 +203,8 @@ func (ta *TimedActionsPlayer) playbackLoop(out chan<- Action, ctrl <-chan contro
 		case <-nextEventTime:
 			if !paused {
 				out <- Action{
-					Position: a.Position,
-					Speed:    a.Speed,
+					Position: ta.posLimitFunc(a.Position),
+					Speed:    ta.speedLimitFunc(a.Speed),
 				}
 				cursor++
 			}

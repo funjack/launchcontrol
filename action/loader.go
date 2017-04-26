@@ -77,7 +77,7 @@ func LoadScript(r io.Reader, contentType string, p Personalization) (protocol.Pl
 	}
 	// Just pass the reader if there is only one supported loader.
 	if len(supportedLoaders) == 1 {
-		return load(supportedLoaders[0], r)
+		return load(supportedLoaders[0], r, p)
 	}
 	// Make a copy of the readers contents to be used multiple times.
 	data, err := ioutil.ReadAll(r)
@@ -85,7 +85,7 @@ func LoadScript(r io.Reader, contentType string, p Personalization) (protocol.Pl
 		return nil, err
 	}
 	for _, loader := range supportedLoaders {
-		if sp, err := load(loader, bytes.NewBuffer(data)); err == nil {
+		if sp, err := load(loader, bytes.NewBuffer(data), p); err == nil {
 			return sp, nil
 		}
 	}
@@ -94,11 +94,13 @@ func LoadScript(r io.Reader, contentType string, p Personalization) (protocol.Pl
 
 // load will try to load the content of r with scriptloader l and return it's
 // player.
-func load(l protocol.Loader, r io.Reader) (protocol.Player, error) {
+func load(l protocol.Loader, r io.Reader, pers Personalization) (protocol.Player, error) {
+	personalizeLoader(l, pers)
 	p, err := l.Load(r)
 	if err != nil {
 		return nil, err
 	}
+	personalizePlayer(p, pers)
 	return p, nil
 }
 
