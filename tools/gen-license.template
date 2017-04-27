@@ -1,0 +1,6 @@
+package main
+
+var licenses = `{{range $index, $t := .}}{{if ne $index 0}}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{{end}}{{.Filename}} - {{.Path}}
+{{.Text}}{{end}}
+`

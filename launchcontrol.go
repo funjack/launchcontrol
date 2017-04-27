@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -13,9 +14,17 @@ import (
 	"github.com/funjack/launchcontrol/manager"
 )
 
+// Update license.go
+//go:generate govendor license -o licenses.go -template tools/gen-license.template
+
+// Update version.go containg the "version" variable
+//go:generate go run tools/gen-version.go
+
 var (
 	listen = flag.String("listen", "127.0.0.1:6969", "listen address")
 	noact  = flag.Bool("noact", false, "simulate launch on console")
+	lics   = flag.Bool("licenses", false, "show licenses")
+	ver    = flag.Bool("version", false, "show version")
 )
 
 func logger(h http.Handler) http.Handler {
@@ -27,6 +36,16 @@ func logger(h http.Handler) http.Handler {
 
 func main() {
 	flag.Parse()
+
+	if *ver {
+		fmt.Println(version)
+		os.Exit(0)
+	}
+	if *lics {
+		fmt.Println(licenses)
+		os.Exit(0)
+	}
+
 	log.Println("Launchcontrol: Get ready for the Launch")
 
 	var l golaunch.Launch
