@@ -36,3 +36,7 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+# External deps
+vendor/*
+!vendor/vendor.json
