@@ -7,16 +7,19 @@
 
 ![Launchcontrol logo](contrib/kodi/script.service.launchcontrol/icon.png "Launchcontrol")
 
-Launchcontrol is a server that can control a Launch, and is meant to be used
-with a plugin for an external player (eg Kodi or VLC)
+Launchcontrol is a server that can control a Launch. This project contains
+plugins for both Kodi and VLC to communicate with the Launchcontrol server
+(loading scripts, pausing playback, etc.)
 
-Currently only Kiiroo scripts work, but the goal is to support multiple haptics
+Currently only Kiiroo scripts work, but the goal is to support multiple haptic
 protocols/formats.
 
-Made for Linux but should also work on a Mac. Works great on a Raspberry
-Pi [LibreELEC](https://libreelec.tv/).
+Launchcontrol is made for Linux but should also work on a Mac. Works great on a
+Raspberry Pi with [LibreELEC](https://libreelec.tv/) using the Kodi addon.
 
-Requires a Launch with firmware 1.2.
+The Kodi and VLC addons should work on all platforms (Linux, Mac and Windows.)
+
+Requires a Launch with (at least) firmware 1.2.
 
 ## Build
 
@@ -68,15 +71,38 @@ on remote sources like SMB or HTTP servers will work.
 
 ### Install
 
-The plugin is located in `contrib/kodi/script.service.launchcontrol`. Just zip
-up the directory (or use the Makefile.) This
-[guide](http://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files) shows how
-to install the zip file in Kodi. After installation the plugin will
+Download `script.service.launchcontrol.zip` from the
+[releases](https://github.com/funjack/launchcontrol/releases) page.  Or package
+the plugin yourself from `contrib/kodi/script.service.launchcontrol`. Just zip
+up the directory (or use the Makefile.)
+
+This [guide](http://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files) shows
+how to install the zip file in Kodi. After installation the plugin will
 automatically start.
 
 **NOTE:** If you are running Launchcontrol on another machine then Kodi or
 are not using the default port, the address can be changed in the add-ons
 `configure` menu.
+
+## VLC Integration
+
+VLC extension for Launchcontrol loads script from the local machine into a
+Launchcontrol server and plays them in sync with a video. Pairing works the
+same as for the Kodi addon, just place the script file next to the video using
+the same base filename.
+
+![VLC Screenshot](contrib/vlc/screenshot001.jpg "VLC Configuration")
+
+**Note:** The VLC extension has less features then the Kodi addon, see [VLC
+Extension README](/contrib/vlc/README.md) for details on what's included.
+
+### Install
+
+Place the [launchcontrol.lua](contrib/vlc/launchcontrol.lua) in VLC's
+`lua/extensions/` directory and reload extensions or restart VLC. The extension
+must be enabled every time VLC is restarted by clicking `view` `->`
+`Launchcontrol`. See [VLC Extension README](/contrib/vlc/README.md) for more
+details on the extension.
 
 ### Raspberry Pi v2/v3 with LibreELEC
 
@@ -94,6 +120,9 @@ Build the script addon:
 ```sh
 make -C contrib/kodi/
 ```
+
+**Note:** Pre-build binaries are also available on the
+[releases](https://github.com/funjack/launchcontrol/releases) page.
 
 Copy the build results and an [autostart.sh](http://wiki.openelec.tv/index.php/Autostart.sh) to the Raspberry Pi:
 ```sh

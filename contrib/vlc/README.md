@@ -30,5 +30,25 @@ Usage
 -----
 
 - Run Launchcontrol server on `http://localhost:6969`
+    - Make sure you can connect to the url before using the extension, VLC might
+      hang if the server is not reachable.
 - In VLC enable extension `Launchcontrol` in the `View` menu.
 - Play a video that has a paired `.kiiroo` file.
+
+Configuration
+-------------
+
+The extension does not (yet) store the config, until it does you have to edit
+the `launchcontrol.lua` file in order to make the changes persistent:
+
+```lua
+--[[ Config ]]--
+local clientConfig = {
+  url = "http://127.0.0.1:6969",
+  latency = 0,
+  positionMin = 0,
+  positionMax = 100,
+  speedMin = 20,
+  speedMax = 100,
+}
+```
