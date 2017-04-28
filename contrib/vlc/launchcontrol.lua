@@ -29,12 +29,22 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --]]
 
+--[[ Config ]]--
+local clientConfig = {
+  url = "http://127.0.0.1:6969",
+  latency = 0,
+  positionMin = 0,
+  positionMax = 100,
+  speedMin = 20,
+  speedMax = 100,
+}
+
 --[[ VLC extension hooks ]]--
 
 function descriptor()
   return {
-    title = "Launchcontrol 0.0.1",
-    version = "0.0.1",
+    title = "Launchcontrol 0.0.2",
+    version = "0.0.2",
     author = "Funjack",
     url = "https://github.com/funjack/launchcontrol/",
     shortdesc = "Launchcontrol",
@@ -70,6 +80,7 @@ end
 function menu()
   vlc.msg.dbg("[Launchcontrol] Menu")
   return {
+    "Configure",
     "Test connection",
   }
 end
@@ -79,8 +90,12 @@ function meta_changed()
 end
 
 function trigger_menu(id)
-  -- Test connection
+  -- Config
   if id == 1 then
+    gui_config()
+  end
+  -- Test connection
+  if id == 2 then
     http_post("http://localhost:6969/v1/play",
               "x-text/kiiroo",
               "{0.50:4,1.00:0,2.50:4,3.00:0}")
@@ -113,8 +128,51 @@ function playing_changed(status)
   if status == 3 then launch_pause() end
 end
 
+--[[ GUI ]]--
+function gui_config()
+  local d = vlc.dialog("Launchcontrol Config")
+  local userInput = {}
+
+  d:add_label("<b>Connection</b>", 1, 1, 3, 1)
+  d:add_label("Address:", 1, 2, 1, 1)
+  userInput["url"] = d:add_text_input(clientConfig["url"], 2, 2, 2, 1)
+  d:add_label("Latency (ms):", 1, 3, 1, 1)
+  userInput["latency"] =  d:add_text_input(clientConfig["latency"], 2, 3, 2, 1)
+  d:add_label("<b>Position boundries</b>", 1, 4, 3, 1)
+  d:add_label("Lowest:", 1, 5, 1, 1)
+  userInput["positionMin"] = d:add_text_input(clientConfig["positionMin"], 2, 5, 2, 1)
+  d:add_label("Highest:", 1, 6, 1, 1)
+  userInput["positionMax"] = d:add_text_input(clientConfig["positionMax"], 2, 6 ,2 ,1)
+  d:add_label("<b>Speed limits</b>", 1, 7, 3, 1)
+  d:add_label("Slowest:", 1, 8, 1, 1)
+  userInput["speedMin"] = d:add_text_input(clientConfig["speedMin"], 2, 8, 2, 1)
+  d:add_label("Fastest:", 1, 9, 1, 1)
+  userInput["speedMax"] = d:add_text_input(clientConfig["speedMax"], 2, 9, 2, 1)
+  d:add_label("", 1, 10, 1, 1)
+  d:add_button("OK", function() update_config(userInput) d:delete() end, 2, 10, 1, 1)
+  d:add_button("Cancel", function() d:delete() end, 3, 10, 1, 1)
+
+  d:show()
+end
+
 
 --[[ Actions ]]--
+
+--- Update config
+function update_config(userInput)
+  local uri = userInput["url"]:get_text()
+  if uri then clientConfig["url"] = uri end
+  local latency = tonumber(userInput["latency"]:get_text())
+  if latency then clientConfig["latency"] = latency end
+  local positionMin = tonumber(userInput["positionMin"]:get_text())
+  if positionMin then clientConfig["positionMin"] = positionMin end
+  local positionMax = tonumber(userInput["positionMax"]:get_text())
+  if positionMax then clientConfig["positionMax"] = positionMax end
+  local speedMin = tonumber(userInput["speedMin"]:get_text())
+  if speedMin then clientConfig["speedMin"] = speedMin end
+  local speedMax = tonumber(userInput["speedMax"]:get_text())
+  if speedMax then clientConfig["speedMax"] = speedMax end
+end
 
 --- Skip to the current time code.
 function launch_skip_to_current_time()
@@ -235,21 +293,20 @@ scriptTypes = {
   },
 }
 
-clientConfig = {
-  url = "http://127.0.0.1:6969",
-  latency = 0,
-  positionMin = 0,
-  positionMax = 100,
-  speedMin = 20,
-  speedMax = 100,
-}
 
 --- Play by sending data as specified mediatype.
 -- @param data      Raw script data.
 -- @param mediaType Mimetype of the script in data
 function launch_play(data, mediaType)
-  -- TODO personalization
-  http_post(clientConfig["url"].."/v1/play", mediaType, data)
+  url = clientConfig["url"].."/v1/play?"
+  params = {
+    "latency="..clientConfig["latency"],
+    "positionmin="..clientConfig["positionMin"],
+    "positionmax="..clientConfig["positionMax"],
+    "speedmin="..clientConfig["speedMin"],
+    "speedmax="..clientConfig["speedMax"],
+  }
+  http_post(url..table.concat(params, "&"), mediaType, data)
 end
 
 --- Stop playback.
