@@ -25,6 +25,7 @@ deploy:
   - launchcontrol_linux_386
   - launchcontrol_linux_arm
   - contrib/kodi/script.service.launchcontrol.zip
+  - contrib/vlc/launchcontrol.lua
   on:
     tags: true
     repo: funjack/launchcontrol

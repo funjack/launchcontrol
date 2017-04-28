@@ -51,12 +51,10 @@ end
 
 function activate()
   vlc.msg.dbg("[Launchcontrol] Get ready for the Launch")
-
-  -- all input changed when a file al already open
+  -- file is already open when we activate
   if vlc.input.item() then
     input_changed()
   end
- 
   vlc.msg.dbg("[Launchcontrol] Activated")
 end
 
@@ -70,6 +68,7 @@ function deactivate()
 end
 
 function menu()
+  vlc.msg.dbg("[Launchcontrol] Menu")
   return {
     "Test connection",
   }
@@ -80,7 +79,6 @@ function meta_changed()
 end
 
 function trigger_menu(id)
-  vlc.msg.dbg("[Launchcontrol] Trigger Menu")
   -- Test connection
   if id == 1 then
     http_post("http://localhost:6969/v1/play",
@@ -91,7 +89,10 @@ end
 
 function input_changed()
   vlc.msg.dbg("[Launchcontrol] Input changed")
+  -- vlc.input.item() must be the first call, it will conflict/hang with
+  -- http_client
   local item = vlc.input.item()
+  launch_stop()
   if item then
     local uri = item:uri()
     if uri then
@@ -103,8 +104,6 @@ function input_changed()
         launch_skip_to_current_time()
       end
     end
-  else
-    launch_stop()
   end
 end
 
@@ -127,8 +126,38 @@ function launch_skip_to_current_time()
   end
 end
 
---- read_script uses VLC stream() to detect and read a scrip file.
+--- read_script detects and reads script file for movie.
 function read_script(file)
+  local baseFilename = remove_extension(file)
+  for _, scriptType in ipairs(scriptTypes) do
+    for _, extension in ipairs(scriptType["extensions"]) do
+      local url = baseFilename.."."..extension
+      local path = local_path(url)
+      if path then
+        vlc.msg.dbg("[Launchcontrol] testing for local file: "..path)
+      end
+
+      local data
+      if path then
+        data = read_file(path)
+      -- FIXME: Disable network source as vlc.stream seems to be racey and
+      -- cause crashes.
+      --else
+        -- FIXME: VLC stream returns UI errors for each try
+      --  data = read_stream(url)
+      end
+      if data and data ~= "" then
+        return data, scriptType["mediaType"]
+      end
+    end
+  end
+  return nil
+end
+
+--[[ Utils ]]--
+
+--- remove_extension removes the file extension from path or url
+function remove_extension(file)
   local dotSplit = {}
   for p in string.gmatch(file, "[^\\.]+") do
     table.insert(dotSplit, p)
@@ -136,28 +165,52 @@ function read_script(file)
   if #dotSplit > 1 then
     table.remove(dotSplit)
   end
+  return table.concat(dotSplit, ".")
+end
 
-  local baseFilename = table.concat(dotSplit, ".")
-
-  for _, scriptType in ipairs(scriptTypes) do
-    for _, extension in ipairs(scriptType["extensions"]) do
-      s, err = vlc.stream(baseFilename.."."..extension)
-      if s then
-        local data = ""
-        local line = s:readline()
-        while line do
-          data = data..line
-          line = s:readline()
-        end
-        if data ~= "" then
-          return data, scriptType["mediaType"]
-        end
-      else
-        vlc.msg.dbg("[Launchcontrol] could not open file: " .. err)
-      end
+--- read_stream
+function read_stream(url)
+  local s, err = vlc.stream(url)
+  if s then
+    local data = ""
+    local line = s:readline()
+    while line do
+      data = data..line
+      line = s:readline()
     end
+    return data
+  end
+  vlc.msg.dbg("[Launchcontrol] could not open file: "..err)
+  return nil
+end
+
+--- local_path returns a path if the file in url is local
+function local_path(url)
+  local u = url_parse(url)
+  if (not u["protocol"]) or u["protocol"] == "file" then
+    return vlc.strings.decode_uri(u["path"])
   end
   return nil
+end
+
+--- read_file reads an entire file
+function read_file(file)
+  local f = io.open(file, "rb")
+  if f then
+    local data = f:read("*a")
+    f:close()
+    return data
+  end
+  return nil
+end
+
+--- url_parse parses an url with either strings or net
+function url_parse(url)
+  if vlc.strings.url_parse then
+    return vlc.strings.url_parse(url)
+  else
+    return vlc.net.url_parse(url)
+  end
 end
 
 --[[ Launch client ]]--
@@ -236,14 +289,9 @@ function http_post(url, contenttype, data)
   return http_request("POST", url, cHdr, data)
 end
 
-function http_request(method, url, headers, body)
-  local u
-  if vlc.strings.url_parse then
-    u = vlc.strings.url_parse(url)
-  else
-    u = vlc.net.url_parse(url)
-  end
 
+function http_request(method, url, headers, body)
+  local u = url_parse(url)
   if u["protocol"] ~= "http" then return false end
 
   local host, path, port = u["host"], u["path"], u["port"]
