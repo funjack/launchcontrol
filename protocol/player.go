@@ -97,7 +97,7 @@ func (ta *TimedActionsPlayer) LimitSpeed(slow, fast int) {
 		// Ignore invalid config
 		return
 	}
-	ta.posLimitFunc = func(s int) int {
+	ta.speedLimitFunc = func(s int) int {
 		if s < slow {
 			return slow
 		}

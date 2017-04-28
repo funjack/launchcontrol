@@ -165,3 +165,73 @@ func TestSkip(t *testing.T) {
 		}
 	}
 }
+
+func TestLimits(t *testing.T) {
+	type TestCase struct {
+		Low, High  int
+		Slow, Fast int
+	}
+
+	cases := []TestCase{
+		{0, 100, 0, 0},
+		{10, 90, 0, 0},
+		{30, 50, 0, 0},
+		{50, 90, 0, 0},
+		{60, 80, 0, 0},
+		{0, 0, 20, 80},
+		{0, 0, 30, 60},
+		{0, 0, 50, 90},
+		{0, 0, 10, 20},
+		{0, 0, 0, 50},
+		{0, 100, 20, 80},
+		{10, 90, 30, 60},
+		{30, 50, 50, 90},
+		{50, 90, 10, 20},
+		{60, 80, 0, 50},
+	}
+	for i, c := range cases {
+		p := NewTimedActionsPlayer()
+		p.Script = script
+		if c.Low != 0 && c.High != 0 {
+			p.LimitPosition(c.Low, c.High)
+		}
+		if c.Slow != 0 && c.Fast != 0 {
+			p.LimitSpeed(c.Slow, c.Fast)
+		}
+
+		lowest, highest := c.Low, c.High
+		slowest, fastest := c.Slow, c.Fast
+
+		for a := range p.Play() {
+			if a.Position < lowest {
+				lowest = a.Position
+			} else if a.Position > highest {
+				highest = a.Position
+			}
+			if a.Position < slowest {
+				slowest = a.Speed
+			} else if a.Position > highest {
+				fastest = a.Speed
+			}
+		}
+
+		if c.Low != 0 && c.High != 0 {
+			if lowest < c.Low {
+				t.Errorf("case %d: went lower than allowed, %d < %d", i, lowest, c.Low)
+			}
+			if highest > c.High {
+				t.Errorf("case %d: went higher than allowed, %d > %d", i, highest, c.High)
+			}
+		}
+
+		if c.Slow != 0 && c.Fast != 0 {
+			if slowest < c.Slow {
+				t.Errorf("case %d: went slower than allowed, %d < %d", i, slowest, c.Slow)
+			}
+			if fastest > c.Fast {
+				t.Errorf("case %d: went higher than allowed, %d > %d", i, fastest, c.Fast)
+			}
+		}
+
+	}
+}
