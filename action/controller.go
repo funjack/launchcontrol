@@ -1,6 +1,7 @@
 package action
 
 import (
+	"encoding/json"
 	"log"
 	"mime"
 	"net/http"
@@ -75,6 +76,24 @@ func (c *Controller) SkipHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	handleManagerError(w, c.manager.Skip(p))
+}
+
+// DumpHandler is a http.Handler to dump the current script.
+func (c *Controller) DumpHandler(w http.ResponseWriter, r *http.Request) {
+	script, err := c.manager.Dump()
+	if err != nil {
+		handleManagerError(w, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	e := json.NewEncoder(w)
+	err = e.Encode(&script)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("internal server error"))
+	}
+	return
 }
 
 // handleManagerError writes a http response based on a manager error.

@@ -163,3 +163,14 @@ func (m *LaunchManager) Skip(p time.Duration) error {
 	}
 	return ErrNotPlaying
 }
+
+// Dump will return the full loaded script.
+func (m *LaunchManager) Dump() (protocol.TimedActions, error) {
+	m.Lock()
+	defer m.Unlock()
+
+	if pp, ok := m.player.(protocol.Dumpable); ok {
+		return pp.Dump()
+	}
+	return nil, ErrNotSupported
+}
