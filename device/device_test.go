@@ -157,6 +157,9 @@ STOP:
 func TestStop(t *testing.T) {
 	fake := &fakeLaunch{}
 	lm := NewLaunchManager(fake)
+	if err := lm.Stop(); err != nil {
+		t.Errorf("stop on empty player did return an error")
+	}
 	p := protocol.NewTimedActionsPlayer()
 	p.Script = testScript
 	lm.SetScriptPlayer(p)
@@ -170,6 +173,8 @@ func TestStop(t *testing.T) {
 	if err := lm.Stop(); err != nil {
 		t.Error(err)
 	}
+	fake.Lock()
+	defer fake.Unlock()
 	if fake.MoveCount > stopAtAction {
 		t.Error("manager did not stop playing")
 	}
