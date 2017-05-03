@@ -9,6 +9,37 @@ import (
 	"github.com/funjack/launchcontrol/protocol"
 )
 
+var testScript = []protocol.TimedAction{
+	{
+		Action: protocol.Action{
+			Position: 5,
+			Speed:    50,
+		},
+		Time: time.Millisecond * 50,
+	},
+	{
+		Action: protocol.Action{
+			Position: 50,
+			Speed:    40,
+		},
+		Time: time.Millisecond * 100,
+	},
+	{
+		Action: protocol.Action{
+			Position: 90,
+			Speed:    90,
+		},
+		Time: time.Millisecond * 150,
+	},
+	{
+		Action: protocol.Action{
+			Position: 30,
+			Speed:    30,
+		},
+		Time: time.Millisecond * 200,
+	},
+}
+
 type fakeLaunch struct {
 	sync.Mutex
 
@@ -46,36 +77,7 @@ func TestManager(t *testing.T) {
 	fake := &fakeLaunch{}
 	lm := NewLaunchManager(fake)
 	p := protocol.NewTimedActionsPlayer()
-	p.Script = []protocol.TimedAction{
-		{
-			Action: protocol.Action{
-				Position: 5,
-				Speed:    50,
-			},
-			Time: time.Millisecond * 50,
-		},
-		{
-			Action: protocol.Action{
-				Position: 50,
-				Speed:    40,
-			},
-			Time: time.Millisecond * 100,
-		},
-		{
-			Action: protocol.Action{
-				Position: 90,
-				Speed:    90,
-			},
-			Time: time.Millisecond * 150,
-		},
-		{
-			Action: protocol.Action{
-				Position: 30,
-				Speed:    30,
-			},
-			Time: time.Millisecond * 200,
-		},
-	}
+	p.Script = testScript
 	lm.SetScriptPlayer(p)
 
 	if err := lm.Play(); err != nil {
@@ -116,4 +118,83 @@ func TestManager(t *testing.T) {
 	if fake.ConnectCount != 2 {
 		t.Errorf("launch did not connect enough")
 	}
+}
+
+func TestTrace(t *testing.T) {
+	fake := &fakeLaunch{}
+	lm := NewLaunchManager(fake)
+	p := protocol.NewTimedActionsPlayer()
+	p.Script = testScript
+	lm.SetScriptPlayer(p)
+
+	trace := lm.Trace()
+	if err := lm.Play(); err != nil {
+		t.Error(err)
+	}
+
+	breakAtAction := 2
+	breakTimer := time.After(testScript[breakAtAction-1].Time +
+		time.Millisecond*25)
+	traced := make([]protocol.Action, 0, len(testScript))
+STOP:
+	for {
+		select {
+		case <-breakTimer:
+			break STOP
+		case a := <-trace:
+			traced = append(traced, a)
+		}
+	}
+	// Make sure at least one more action is written to the unread channel
+	time.Sleep(testScript[len(testScript)-1].Time - testScript[breakAtAction].Time)
+
+	if breakAtAction != len(traced) {
+		t.Errorf("did not trace all actions: want %d, got %d",
+			breakAtAction, len(traced))
+	}
+}
+
+func TestStop(t *testing.T) {
+	fake := &fakeLaunch{}
+	lm := NewLaunchManager(fake)
+	p := protocol.NewTimedActionsPlayer()
+	p.Script = testScript
+	lm.SetScriptPlayer(p)
+
+	if err := lm.Play(); err != nil {
+		t.Error(err)
+	}
+
+	stopAtAction := 2
+	time.Sleep(testScript[stopAtAction-1].Time + time.Millisecond*25)
+	if err := lm.Stop(); err != nil {
+		t.Error(err)
+	}
+	if fake.MoveCount > stopAtAction {
+		t.Error("manager did not stop playing")
+	}
+}
+
+func TestDump(t *testing.T) {
+	fake := &fakeLaunch{}
+	lm := NewLaunchManager(fake)
+
+	if _, err := lm.Dump(); err != ErrNotSupported {
+		t.Errorf("dump on empty player did not return error")
+	}
+
+	p := protocol.NewTimedActionsPlayer()
+	p.Script = testScript
+	lm.SetScriptPlayer(p)
+
+	dump, err := lm.Dump()
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(testScript) != len(dump) {
+		t.Errorf("dump is not complete: want %d, got %d",
+			len(testScript), len(dump))
+	}
+
 }
