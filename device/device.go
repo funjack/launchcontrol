@@ -1,4 +1,4 @@
-package manager
+package device
 
 import (
 	"context"

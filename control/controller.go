@@ -9,17 +9,17 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/funjack/launchcontrol/manager"
+	"github.com/funjack/launchcontrol/device"
 	"github.com/gorilla/websocket"
 )
 
 // Controller translates http requests into manager actions.
 type Controller struct {
-	manager *manager.LaunchManager
+	manager *device.LaunchManager
 }
 
 // NewController returns a new controller for the given manager.
-func NewController(m *manager.LaunchManager) *Controller {
+func NewController(m *device.LaunchManager) *Controller {
 	return &Controller{
 		manager: m,
 	}
@@ -133,10 +133,10 @@ func handleManagerError(w http.ResponseWriter, err error) {
 	case nil:
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK\n"))
-	case manager.ErrNotSupported:
+	case device.ErrNotSupported:
 		w.WriteHeader(http.StatusConflict)
 		w.Write([]byte("operation not supported by loaded script type\n"))
-	case manager.ErrNotPlaying:
+	case device.ErrNotPlaying:
 		w.WriteHeader(http.StatusConflict)
 		w.Write([]byte("operation cannot be executed when not playing\n"))
 	default:

@@ -11,7 +11,7 @@ import (
 
 	"github.com/funjack/golaunch"
 	"github.com/funjack/launchcontrol/control"
-	"github.com/funjack/launchcontrol/manager"
+	"github.com/funjack/launchcontrol/device"
 )
 
 // Update license.go
@@ -56,7 +56,7 @@ func main() {
 		defer l.Disconnect()
 	}
 
-	lm := manager.NewLaunchManager(l)
+	lm := device.NewLaunchManager(l)
 	c := control.NewController(lm)
 
 	http.Handle("/v1/play", logger(http.HandlerFunc(c.PlayHandler)))
