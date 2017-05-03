@@ -66,7 +66,7 @@ func TestPauseResume(t *testing.T) {
 	pauseTime := time.Millisecond * 100
 
 	go func() {
-		<-time.After(time.Millisecond * 100)
+		<-time.After(time.Millisecond * 75)
 		if err := p.Pause(); err != nil {
 			t.Error(err)
 		}
