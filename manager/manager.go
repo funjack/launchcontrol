@@ -104,7 +104,7 @@ func (m *LaunchManager) Play() error {
 		go func() {
 			for a := range m.player.Play() {
 				m.launch.Move(a.Position, a.Speed)
-				for t, _ := range m.tracers {
+				for t := range m.tracers {
 					select {
 					case t <- a:
 					default:
