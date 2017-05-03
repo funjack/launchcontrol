@@ -27,8 +27,9 @@ var ConnectionTimeout = time.Second * 10
 type LaunchManager struct {
 	sync.Mutex
 
-	launch golaunch.Launch
-	player protocol.Player
+	launch  golaunch.Launch
+	player  protocol.Player
+	tracers map[chan protocol.Action]bool
 
 	isPlaying   bool
 	isConnected bool
@@ -37,7 +38,8 @@ type LaunchManager struct {
 // NewLaunchManager creates a new manager for the given Launch.
 func NewLaunchManager(l golaunch.Launch) *LaunchManager {
 	lm := &LaunchManager{
-		launch: l,
+		launch:  l,
+		tracers: make(map[chan protocol.Action]bool),
 	}
 	lm.launch.HandleDisconnect(func() {
 		lm.Lock()
@@ -102,6 +104,16 @@ func (m *LaunchManager) Play() error {
 		go func() {
 			for a := range m.player.Play() {
 				m.launch.Move(a.Position, a.Speed)
+				for t, _ := range m.tracers {
+					select {
+					case t <- a:
+					default:
+						close(t)
+						m.Lock()
+						delete(m.tracers, t)
+						m.Unlock()
+					}
+				}
 			}
 			m.Lock()
 			m.isPlaying = false
@@ -173,4 +185,14 @@ func (m *LaunchManager) Dump() (protocol.TimedActions, error) {
 		return pp.Dump()
 	}
 	return nil, ErrNotSupported
+}
+
+// Trace returns a channel that receives the same actions as are send to the
+// Launch.
+func (m *LaunchManager) Trace() <-chan protocol.Action {
+	m.Lock()
+	defer m.Unlock()
+	t := make(chan protocol.Action)
+	m.tracers[t] = true
+	return t
 }

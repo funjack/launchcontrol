@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/funjack/launchcontrol/manager"
+	"github.com/gorilla/websocket"
 )
 
 // Controller translates http requests into manager actions.
@@ -94,6 +95,36 @@ func (c *Controller) DumpHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("internal server error"))
 	}
 	return
+}
+
+// WebsocketHandler implements http.Handler that reponds with a websocket
+// writing status messages in JSON.
+func (c *Controller) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
+	var upgrader = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	go func() {
+		for {
+			if _, _, err := conn.NextReader(); err != nil {
+				conn.Close()
+				break
+			}
+		}
+	}()
+	for a := range c.manager.Trace() {
+		if err = conn.WriteJSON(a); err != nil {
+			return
+		}
+	}
 }
 
 // handleManagerError writes a http response based on a manager error.
