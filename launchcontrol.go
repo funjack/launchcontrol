@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/funjack/golaunch"
-	"github.com/funjack/launchcontrol/action"
-	"github.com/funjack/launchcontrol/manager"
+	"github.com/funjack/launchcontrol/control"
+	"github.com/funjack/launchcontrol/device"
 )
 
 // Update license.go
@@ -56,14 +56,16 @@ func main() {
 		defer l.Disconnect()
 	}
 
-	lm := manager.NewLaunchManager(l)
-	c := action.NewController(lm)
+	lm := device.NewLaunchManager(l)
+	c := control.NewController(lm)
 
 	http.Handle("/v1/play", logger(http.HandlerFunc(c.PlayHandler)))
 	http.Handle("/v1/stop", logger(http.HandlerFunc(c.StopHandler)))
 	http.Handle("/v1/pause", logger(http.HandlerFunc(c.PauseHandler)))
 	http.Handle("/v1/resume", logger(http.HandlerFunc(c.ResumeHandler)))
 	http.Handle("/v1/skip", logger(http.HandlerFunc(c.SkipHandler)))
+	http.Handle("/v1/dump", logger(http.HandlerFunc(c.DumpHandler)))
+	http.Handle("/v1/socket", logger(http.HandlerFunc(c.WebsocketHandler)))
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt)

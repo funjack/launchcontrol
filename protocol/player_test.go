@@ -66,7 +66,7 @@ func TestPauseResume(t *testing.T) {
 	pauseTime := time.Millisecond * 100
 
 	go func() {
-		<-time.After(time.Millisecond * 100)
+		<-time.After(time.Millisecond * 75)
 		if err := p.Pause(); err != nil {
 			t.Error(err)
 		}
@@ -233,5 +233,19 @@ func TestLimits(t *testing.T) {
 			}
 		}
 
+	}
+}
+
+func TestDump(t *testing.T) {
+	p := NewTimedActionsPlayer()
+	p.Script = script
+
+	actions, err := p.Dump()
+	if err != nil {
+		t.Error(err)
+	}
+	if len(script) != len(actions) {
+		t.Errorf("dump did not return script actions: want %d, got %d",
+			len(script), len(actions))
 	}
 }

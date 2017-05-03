@@ -1,6 +1,7 @@
-package action
+package control
 
 import (
+	"encoding/json"
 	"log"
 	"mime"
 	"net/http"
@@ -8,16 +9,17 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/funjack/launchcontrol/manager"
+	"github.com/funjack/launchcontrol/device"
+	"github.com/gorilla/websocket"
 )
 
 // Controller translates http requests into manager actions.
 type Controller struct {
-	manager *manager.LaunchManager
+	manager *device.LaunchManager
 }
 
 // NewController returns a new controller for the given manager.
-func NewController(m *manager.LaunchManager) *Controller {
+func NewController(m *device.LaunchManager) *Controller {
 	return &Controller{
 		manager: m,
 	}
@@ -77,16 +79,64 @@ func (c *Controller) SkipHandler(w http.ResponseWriter, r *http.Request) {
 	handleManagerError(w, c.manager.Skip(p))
 }
 
+// DumpHandler is a http.Handler to dump the current script.
+func (c *Controller) DumpHandler(w http.ResponseWriter, r *http.Request) {
+	script, err := c.manager.Dump()
+	if err != nil {
+		handleManagerError(w, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	e := json.NewEncoder(w)
+	err = e.Encode(&script)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("internal server error"))
+	}
+	return
+}
+
+// WebsocketHandler implements http.Handler that reponds with a websocket
+// writing status messages in JSON.
+func (c *Controller) WebsocketHandler(w http.ResponseWriter, r *http.Request) {
+	var upgrader = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	go func() {
+		for {
+			if _, _, err := conn.NextReader(); err != nil {
+				conn.Close()
+				break
+			}
+		}
+	}()
+	for a := range c.manager.Trace() {
+		if err = conn.WriteJSON(a); err != nil {
+			return
+		}
+	}
+}
+
 // handleManagerError writes a http response based on a manager error.
 func handleManagerError(w http.ResponseWriter, err error) {
 	switch err {
 	case nil:
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK\n"))
-	case manager.ErrNotSupported:
+	case device.ErrNotSupported:
 		w.WriteHeader(http.StatusConflict)
 		w.Write([]byte("operation not supported by loaded script type\n"))
-	case manager.ErrNotPlaying:
+	case device.ErrNotPlaying:
 		w.WriteHeader(http.StatusConflict)
 		w.Write([]byte("operation cannot be executed when not playing\n"))
 	default:

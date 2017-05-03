@@ -147,6 +147,13 @@ func (ta *TimedActionsPlayer) Skip(p time.Duration) error {
 	})
 }
 
+// Dump will return the loaded script as TimedActions.
+func (ta *TimedActionsPlayer) Dump() (TimedActions, error) {
+	var s = make(TimedActions, len(ta.Script))
+	copy(s, ta.Script)
+	return s, nil
+}
+
 // playbackLoop will play the loaded script to out and can be controlled using
 // ctrl.
 func (ta *TimedActionsPlayer) playbackLoop(out chan<- Action, ctrl <-chan control) {
