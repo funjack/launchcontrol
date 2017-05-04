@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Launchcontrol</title>
+
+    <!-- jQuery UI -->
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/base/jquery-ui.css" type="text/css" media="all" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <!-- Launch -->
+    <link rel="stylesheet" type="text/css" href="css/ui/launch.css">
+    <!-- Launchcontrol -->
+    <link rel="stylesheet" type="text/css" href="css/launchcontrol.css">
+  </head>
+
+  <body>
+    <div class="container-fluid fullscreen">
+    <h1>Launchcontrol</h1>
+    <div class="row fullheight">
+      <div class="col-md-4 fullheight">
+        <div class="panel panel-default fullheight">
+          <div class="panel-heading">
+            <div class="btn-group" role="group" aria-label="controls">
+              <button type="button" class="btn btn-default disabled"><span class="glyphicon glyphicon-backward" aria-hidden="true"></span></button>
+              <button type="button" class="btn btn-default disabled"><span class="glyphicon glyphicon-play" aria-hidden="true"></span></button>
+              <button type="button" class="btn btn-default disabled"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span></button>
+              <button type="button" class="btn btn-default disabled"><span class="glyphicon glyphicon-stop" aria-hidden="true"></span></button>
+              <button type="button" class="btn btn-default disabled"><span class="glyphicon glyphicon-forward" aria-hidden="true"></span></button>
+              <button type="button" class="btn btn-default disabled"><span class="glyphicon glyphicon-open-file" aria-hidden="true"></span></button>
+            </div>
+          </div>
+          <div class="panel-body fullscreen">
+            <div id="fleshlight" class="fullheight"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- jQuery  -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" type="text/javascript"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" type="text/javascript"></script>
+    <!-- Bootstrap -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <!-- Launch -->
+    <script src="js/ui/launch.js" type="text/javascript"></script>
+    <!-- Launchcontrol -->
+    <script src="js/launchcontrol.js" type="text/javascript"></script>
+  </body>
+</html>

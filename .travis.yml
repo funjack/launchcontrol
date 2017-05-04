@@ -6,6 +6,9 @@ install:
 - go install github.com/kardianos/govendor
 - govendor sync
 - go generate
+#- go get github.com/jteeuwen/go-bindata/...
+#- go get github.com/elazarl/go-bindata-assetfs/...
+#- go-bindata-assetfs html/...
 script:
 - "./tools/gotest.sh"
 after_success:

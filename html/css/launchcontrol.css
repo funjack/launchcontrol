@@ -1,0 +1,11 @@
+html,body {
+  height:100%;
+}
+
+.fullscreen {
+  height: 90%;
+}
+
+.fullheight {
+  height: 100%;
+}
