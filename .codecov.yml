@@ -1,0 +1,4 @@
+ignore:
+  - "contrib/.*"
+  - "tools/.*"
+  - "vendor/.*"

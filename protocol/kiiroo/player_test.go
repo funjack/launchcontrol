@@ -14,9 +14,7 @@ var scenario = "{1.00:1,1.50:4,1.51:4,1.51:3,1.52:4,1.66:1,1.84:2,1.85:3,1.90:4,
 
 func playerwithscenario(scenario string) (protocol.Player, error) {
 	b := bytes.NewBufferString(scenario)
-	sp := NewScriptPlayer()
-	err := sp.Load(b)
-	return sp, err
+	return Load(b)
 }
 
 type actionValidator struct {
