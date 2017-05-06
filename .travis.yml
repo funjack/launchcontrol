@@ -1,4 +1,7 @@
 language: go
+os:
+- linux
+- osx
 go:
 - 1.8
 install:
@@ -14,10 +17,11 @@ script:
 after_success:
 - bash <(curl -s https://codecov.io/bash)
 before_deploy:
-- GOOS=linux GOARCH=amd64 go build -o launchcontrol_linux_amd64
-- GOOS=linux GOARCH=386 go build -o launchcontrol_linux_386
-- GOOS=linux GOARCH=arm go build -o launchcontrol_linux_arm
-- make -C ./contrib/kodi/ script.service.launchcontrol.zip
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; GOOS=linux GOARCH=amd64 go build -o launchcontrol_linux_amd64; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; GOOS=linux GOARCH=386 go build -o launchcontrol_linux_386; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; GOOS=linux GOARCH=arm go build -o launchcontrol_linux_arm; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then GOOS=darwin GOARCH=amd64 go build -o launchcontrol_darwin_amd64; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; make -C ./contrib/kodi/ script.service.launchcontrol.zip; fi
 deploy:
   skip_cleanup: true
   provider: releases
@@ -27,6 +31,7 @@ deploy:
   - launchcontrol_linux_amd64
   - launchcontrol_linux_386
   - launchcontrol_linux_arm
+  - launchcontrol_darwin_amd64
   - contrib/kodi/script.service.launchcontrol.zip
   - contrib/vlc/launchcontrol.lua
   on:
