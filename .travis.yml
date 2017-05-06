@@ -17,11 +17,11 @@ script:
 after_success:
 - bash <(curl -s https://codecov.io/bash)
 before_deploy:
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; GOOS=linux GOARCH=amd64 go build -o launchcontrol_linux_amd64; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; GOOS=linux GOARCH=386 go build -o launchcontrol_linux_386; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; GOOS=linux GOARCH=arm go build -o launchcontrol_linux_arm; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then GOOS=darwin GOARCH=amd64 go build -o launchcontrol_darwin_amd64; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; make -C ./contrib/kodi/ script.service.launchcontrol.zip; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then GOOS=linux GOARCH=amd64 go build -o launchcontrol_linux_amd64; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then GOOS=linux GOARCH=386 go build -o launchcontrol_linux_386; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then GOOS=linux GOARCH=arm go build -o launchcontrol_linux_arm; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then GOOS=darwin GOARCH=amd64 go build -o launchcontrol_darwin_amd64; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make -C ./contrib/kodi/ script.service.launchcontrol.zip; fi
 deploy:
   skip_cleanup: true
   provider: releases
