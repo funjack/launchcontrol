@@ -1,4 +1,6 @@
 ignore:
+  - "bindata_assetfs.go"
   - "contrib/.*"
+  - "html/.*"
   - "tools/.*"
   - "vendor/.*"

@@ -66,6 +66,7 @@ func main() {
 	http.Handle("/v1/skip", logger(http.HandlerFunc(c.SkipHandler)))
 	http.Handle("/v1/dump", logger(http.HandlerFunc(c.DumpHandler)))
 	http.Handle("/v1/socket", logger(http.HandlerFunc(c.WebsocketHandler)))
+	http.Handle("/", logger(http.FileServer(assetFS())))
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt)
