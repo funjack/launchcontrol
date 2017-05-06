@@ -37,7 +37,7 @@ deploy:
     tags: true
     repo: funjack/launchcontrol
     branch: "master"
-    os: linux
+    condition: $TRAVIS_OS_NAME = linux
 deploy:
   skip_cleanup: true
   provider: releases
@@ -49,4 +49,4 @@ deploy:
     tags: true
     repo: funjack/launchcontrol
     branch: "master"
-    os: osx
+    condition: $TRAVIS_OS_NAME = osx
