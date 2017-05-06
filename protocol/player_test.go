@@ -36,6 +36,20 @@ var script = []TimedAction{
 	},
 }
 
+type timeTolerance time.Duration
+
+func (p timeTolerance) roughlyEqual(a time.Duration, b time.Duration) bool {
+	if a > b+time.Duration(p) {
+		return false
+	}
+	if a < b-time.Duration(p) {
+		return false
+	}
+	return true
+}
+
+var defaultTimeTolerance = timeTolerance(time.Millisecond * 30)
+
 func TestPlay(t *testing.T) {
 	p := NewTimedActionsPlayer()
 	p.Script = script
@@ -54,7 +68,7 @@ func TestPlay(t *testing.T) {
 			len(script), eventCount)
 	}
 	want := script[len(script)-1].Time
-	if playTime.Nanoseconds()/1e6 != want.Nanoseconds()/1e6 {
+	if !defaultTimeTolerance.roughlyEqual(playTime, want) {
 		t.Errorf("script was not played back at correct speed")
 	}
 }
@@ -88,7 +102,7 @@ func TestPauseResume(t *testing.T) {
 			len(script), eventCount)
 	}
 	want := script[len(script)-1].Time + pauseTime
-	if playTime.Nanoseconds()/1e6 != want.Nanoseconds()/1e6 {
+	if !defaultTimeTolerance.roughlyEqual(playTime, want) {
 		t.Errorf("script was not played back at correct speed")
 	}
 }
@@ -112,7 +126,7 @@ func TestStop(t *testing.T) {
 	}
 	playTime := time.Now().Sub(starttime)
 
-	if playTime.Nanoseconds()/1e6 != stopTime.Nanoseconds()/1e6 {
+	if !defaultTimeTolerance.roughlyEqual(playTime, stopTime) {
 		t.Errorf("script was not stopped at the right time, want: %s, got: %s",
 			stopTime, playTime)
 	}
@@ -159,7 +173,7 @@ func TestSkip(t *testing.T) {
 		playTime := time.Now().Sub(starttime)
 		want := script[len(script)-1].Time - (c.To - c.At)
 
-		if playTime.Nanoseconds()/1e6 != want.Nanoseconds()/1e6 {
+		if !defaultTimeTolerance.roughlyEqual(playTime, want) {
 			t.Errorf("%s: player did not skip correctly, want: %s, got: %s",
 				c.Name, want, playTime)
 		}
