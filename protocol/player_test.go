@@ -48,7 +48,7 @@ func (p timeTolerance) roughlyEqual(a time.Duration, b time.Duration) bool {
 	return true
 }
 
-var defaultTimeTolerance = timeTolerance(time.Millisecond * 10)
+var defaultTimeTolerance = timeTolerance(time.Millisecond * 30)
 
 func TestPlay(t *testing.T) {
 	p := NewTimedActionsPlayer()
