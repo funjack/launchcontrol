@@ -31,10 +31,22 @@ deploy:
   - launchcontrol_linux_amd64
   - launchcontrol_linux_386
   - launchcontrol_linux_arm
-  - launchcontrol_darwin_amd64
   - contrib/kodi/script.service.launchcontrol.zip
   - contrib/vlc/launchcontrol.lua
   on:
     tags: true
     repo: funjack/launchcontrol
     branch: "master"
+    os: linux
+deploy:
+  skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: c0/FX+xBb5JQrEptldQgCcvrudTA8NEVyzGu+Uv1mmuMTWOT3t9uHwYjYufe9U194ahdP41wO/TqDCPQb0VEQPnnAvolcfnZKuEt0pfZnkWTuB/X1KLsNpiyAd1w2Q9q1kM0eY7NsHZdHRlFcEqh1J9yK24hV1tkI+LLOSPsNXzbBVP0UEcnPwbZYkbWqU8GqwZkqg902J5rzDCLRI9hGc97+VDNfftn8waxj/96JyQHIRNtC9aO0H9ya5R/2hf+CUlLzqnj4DtR+yOGXSfDFPApFlLaaEaKlxv5G7Suo0MS1L8H8EU4lSY/e8kfc++ynwXM4eom4s/HyxVw/Wuq4dpoQfP0GYAg/LtgRuo9z3mzr1EHop03hhIQgLrowkcUtSabq+jJ+S9HH9kb5sy3tpXuhNcDo2pVNyPQJ+tghiV5bFh7AsAUNwnd4sgUpdfn9Ph2mgkIRzHS4dDOR0so4ZyPQmA2dfWg8Xa850xNjMr1ExzARYwvwMCRUJ2Sodq9WzQPHQKx7lWYE/vYE8b/0Q6H776c87wql7AwqFE8JrjvSGjmDvIayQkhOWWc1Cexc/IpkhJmNivTlv7ip49RIZf3EDmLX2ES0PNrzIrv6nUhd/MYYyjCFVvFySV+ozHRELLvEzNrG9xESsVtAPH84lWJiTaK3HkLc98aeQjESVo=
+  file:
+  - launchcontrol_darwin_amd64
+  on:
+    tags: true
+    repo: funjack/launchcontrol
+    branch: "master"
+    os: osx
