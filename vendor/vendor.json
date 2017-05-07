@@ -69,10 +69,10 @@
 			"revisionTime": "2017-02-27T21:27:28Z"
 		},
 		{
-			"checksumSHA1": "IvCm2ufb6nFHJOWrTJPUwelKrRc=",
+			"checksumSHA1": "nhxZYqyQm5nLvOOimkvUWkxtvKY=",
 			"path": "github.com/funjack/golaunch",
-			"revision": "2485064409c12ea5d352a5f5156aeae7d71b8ec7",
-			"revisionTime": "2017-04-17T00:09:00Z"
+			"revision": "810bfd85f86da14616633534b6115a83787faaf6",
+			"revisionTime": "2017-05-07T10:54:01Z"
 		},
 		{
 			"checksumSHA1": "hEnH6sgR83Qfx7UNnphNNlelmj0=",
@@ -105,10 +105,10 @@
 			"revisionTime": "2016-10-27T14:08:23Z"
 		},
 		{
-			"checksumSHA1": "ynJSWoF6v+3zMnh9R0QmmG6iGV8=",
+			"checksumSHA1": "rJab1YdNhQooDiBWNnt7TLWPyBU=",
 			"path": "github.com/pkg/errors",
-			"revision": "ff09b135c25aae272398c51a07235b90a75aa4f0",
-			"revisionTime": "2017-03-16T20:15:38Z"
+			"revision": "c605e284fe17294bda444b34710735b29d1a9d90",
+			"revisionTime": "2017-05-05T04:36:39Z"
 		},
 		{
 			"checksumSHA1": "1ya4UtselIOmBQb4ygCm5nQLvAc=",
