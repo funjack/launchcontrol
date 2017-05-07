@@ -7,19 +7,34 @@
 
 ![Launchcontrol logo](contrib/kodi/script.service.launchcontrol/icon.png "Launchcontrol")
 
-Launchcontrol is a server that can control a Launch. This project contains
-plugins for both Kodi and VLC to communicate with the Launchcontrol server
-(loading scripts, pausing playback, etc.)
+Launchcontrol is a server that can control/playback scripts on a Launch. This
+project contains plugins for both Kodi and VLC to communicate with the
+Launchcontrol server (loading scripts, pausing playback, etc.)
 
-Currently only Kiiroo scripts work, but the goal is to support multiple haptic
-protocols/formats.
+Currently only the Kiiroo script format is implemented, but the goal is to
+support multiple haptic protocols/formats.
 
-Launchcontrol is made for Linux but should also work on a Mac. Works great on a
-Raspberry Pi with [LibreELEC](https://libreelec.tv/) using the Kodi addon.
+The main platform for Launchcontrol is Linux, but it has been successfully
+tested on Mac OS X. Works great on a Raspberry Pi with
+[LibreELEC](https://libreelec.tv/) using the Kodi addon.
 
 The Kodi and VLC addons should work on all platforms (Linux, Mac and Windows.)
 
 Requires a Launch with (at least) firmware 1.2.
+
+## Downloads
+
+Check the [releases](https://github.com/funjack/launchcontrol/releases) page
+for the latest binary downloads.
+
+| Filename                           | Description              |
+| ---------------------------------- | ------------------------ |
+| `launchcontrol_linux_amd64`        | Linux (64-bit)           |
+| `launchcontrol_linux_386`          | Linux (32-bit)           |
+| `launchcontrol_darwin_amd64`       | Mac OS X                 |
+| `launchcontrol_linux_arm`          | Linux ARM (Raspberry Pi) |
+| `script.service.launchcontrol.zip` | Kodi Addon               |
+| `launchcontrol.lua`                | VLC Extension            |
 
 ## Build
 
@@ -57,6 +72,8 @@ curl http://localhost:6969/v1/play
 The Launchcontrol Kodi service addon connects to a local Launchserver and auto
 loads scripts and synchronizes playback, taking into account actions like
 pausing and seeking.
+
+![Kodi screenshot](contrib/kodi/script.service.launchcontrol/resources/screenshot003.jpg "Kodi Addon")
 
 Scripts that are paired with the movie file will be loaded. Pairing is done by
 placing a script file next a movie using the same base filename (this mirrors

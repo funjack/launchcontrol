@@ -16,6 +16,7 @@
       <icon>icon.png</icon>
       <screenshot>resources/screenshot001.jpg</screenshot>
       <screenshot>resources/screenshot002.jpg</screenshot>
+      <screenshot>resources/screenshot003.jpg</screenshot>
     </assets>
   </extension>
 </addon>

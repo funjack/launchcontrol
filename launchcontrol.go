@@ -17,7 +17,7 @@ import (
 // Update license.go
 //go:generate govendor license -o licenses.go -template tools/gen-license.template
 
-// Update version.go containg the "version" variable
+// Update version.go containing the "version" variable
 //go:generate go run tools/gen-version.go
 
 var (
