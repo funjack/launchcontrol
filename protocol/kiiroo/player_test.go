@@ -3,6 +3,7 @@ package kiiroo
 import (
 	"bytes"
 	"fmt"
+	"runtime"
 	"testing"
 	"time"
 
@@ -40,6 +41,14 @@ func (a *actionValidator) Validate(p int, t time.Duration) error {
 }
 
 func TestPlay(t *testing.T) {
+	// The runtime on darwin uses the wallclock for timeres. Timer tests
+	// running on TravisCI vm's where the clock is synced with ntp can
+	// cause 'false' positives.
+	// TODO remove with Go 1.9: https://go-review.googlesource.com/c/35292
+	if runtime.GOOS == "darwin" {
+		t.Skip("don't run timing tests on darwin #17610")
+	}
+
 	k, err := playerwithscenario(scenario)
 	if err != nil {
 		t.Error(err)
