@@ -96,9 +96,7 @@ function trigger_menu(id)
   end
   -- Test connection
   if id == 2 then
-    http_post("http://localhost:6969/v1/play",
-              "x-text/kiiroo",
-              "{0.50:4,1.00:0,2.50:4,3.00:0}")
+    launch_play("{0.50:4,1.00:0,2.50:4,3.00:0}", "x-text/kiiroo")
   end
 end
 
