@@ -30,6 +30,18 @@ var Loaders = []Loader{
 			"text/plain",
 		},
 	},
+	{
+		Loader: protocol.LoaderFunc(kiiroo.LoadText),
+		ContentTypes: []string{
+			"text/plain",
+		},
+	},
+	{
+		Loader: protocol.LoaderFunc(kiiroo.LoadJSON),
+		ContentTypes: []string{
+			"application/json",
+		},
+	},
 }
 
 // ErrUnsupported is returned when the script can't be loaded by any
