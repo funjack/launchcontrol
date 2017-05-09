@@ -11,9 +11,6 @@ Launchcontrol is a server that can control/playback scripts on a Launch. This
 project contains plugins for both Kodi and VLC to communicate with the
 Launchcontrol server (loading scripts, pausing playback, etc.)
 
-Currently only the Kiiroo script format is implemented, but the goal is to
-support multiple haptic protocols/formats.
-
 The main platform for Launchcontrol is Linux, but it has been successfully
 tested on Mac OS X. Works great on a Raspberry Pi with
 [LibreELEC](https://libreelec.tv/) using the Kodi addon.
@@ -21,6 +18,15 @@ tested on Mac OS X. Works great on a Raspberry Pi with
 The Kodi and VLC addons should work on all platforms (Linux, Mac and Windows.)
 
 Requires a Launch with (at least) firmware 1.2.
+
+## Script formats
+
+Supported haptic script formats:
+
+| Format | Content Type | File extensions |
+| ------ | ------------ | --------------- |
+| [Raw](https://godoc.org/github.com/funjack/launchcontrol/protocol/raw) | `application/prs.launchraw+json` | `.launch` `.json` |
+| [Kiiroo](https://godoc.org/github.com/funjack/launchcontrol/protocol/kiiroo) | `text/prs.kiiroo` | `.kiiroo` |
 
 ## Downloads
 
@@ -53,8 +59,8 @@ sudo setcap 'cap_net_raw,cap_net_admin=eip' ./launchcontrol
 
 ```sh
 # Load and play script
-curl -XPOST --data-ascii "{0.50:1,1.00:4,1.15:0,2.00:2}" \
-	http://localhost:6969/v1/play
+curl -XPOST -H "Content-Type: text/prs.kiiroo" --data-ascii \
+	"{0.50:1,1.00:4,1.15:0,2.00:2}" http://localhost:6969/v1/play
 # Pause a playing script
 curl http://localhost:6969/v1/pause
 # Resume paused script
