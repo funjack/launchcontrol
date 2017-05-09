@@ -10,17 +10,24 @@ import (
 
 	"github.com/funjack/launchcontrol/protocol"
 	"github.com/funjack/launchcontrol/protocol/kiiroo"
+	"github.com/funjack/launchcontrol/protocol/raw"
 )
 
 // Loaders contains all the registered ScriptLoaders.
 var Loaders = []Loader{
 	{
+		Loader: protocol.LoaderFunc(raw.Load),
+		ContentTypes: []string{
+			"application/prs.launchcontrol+json",
+			"application/json",
+		},
+	},
+	{
 		Loader: protocol.LoaderFunc(kiiroo.Load),
 		ContentTypes: []string{
+			"text/prs.kiiroo",
 			"x-text/kiiroo",
 			"text/plain",
-			"application/x-www-form-urlencoded",
-			"multipart/form-data",
 		},
 	},
 }
