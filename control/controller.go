@@ -33,6 +33,11 @@ func (c *Controller) PlayHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			mediaType = ""
 		}
+		// Make form submitted data an unknown media type
+		if mediaType == "application/x-www-form-urlencoded" ||
+			mediaType == "multipart/form-data" {
+			mediaType = ""
+		}
 		k, err := LoadScript(r.Body, mediaType, pers)
 		if err == ErrUnsupported {
 			w.WriteHeader(http.StatusUnsupportedMediaType)
