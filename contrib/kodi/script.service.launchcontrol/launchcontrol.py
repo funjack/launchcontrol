@@ -11,19 +11,39 @@ import urllib2
 
 scripttypes = [
         {
+            "name"      : "raw", 
+            "extensions": ["launch"],
+            "mediaType" : "application/prs.launchraw+json",
+        },
+        {
             "name"      : "kiiroo", 
             "extensions": ["kiiroo"],
-            "mediaType" : "x-text/kiiroo",
+            "mediaType" : "text/prs.kiiroo",
         },
         {
             "name"      : "realtouch", 
             "extensions": ["realtouch", "ott"],
-            "mediaType" : "x-text/realtouch",
+            "mediaType" : "text/prs.realtouch",
         },
         {
             "name"      : "vorze", 
-            "extensions": ["vorze", "csv"],
-            "mediaType" : "x-text/vorze",
+            "extensions": ["vorze"],
+            "mediaType" : "text/prs.vorze",
+        },
+        {
+            "name"      : "json", 
+            "extensions": ["json"],
+            "mediaType" : "application/json",
+        },
+        {
+            "name"      : "text", 
+            "extensions": ["txt"],
+            "mediaType" : "text/plain",
+        },
+        {
+            "name"      : "csv", 
+            "extensions": ["csv"],
+            "mediaType" : "text/csv",
         },
 ]
 

@@ -18,7 +18,7 @@ def TestConnection():
                 positionmax=__addon__.getSetting("positionmax"),
                 speedmin=__addon__.getSetting("speedmin"),
                 speedmax=__addon__.getSetting("speedmax"))
-        l.Play("{0.50:4,1.00:0,2.50:4,3.00:0}", "x-text/kiiroo")
+        l.Play("{0.50:4,1.00:0,2.50:4,3.00:0}", "text/prs.kiiroo")
     except Exception as e:
         progressDialog.close()
         xbmcgui.Dialog().ok("Launchcontrol connection test" , "Failed:", e.message)

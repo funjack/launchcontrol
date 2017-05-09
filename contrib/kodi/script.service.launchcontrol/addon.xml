@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="script.service.launchcontrol" version="0.0.3" name="Launchcontrol" provider-name="Funjack">
+<addon id="script.service.launchcontrol" version="0.0.4" name="Launchcontrol" provider-name="Funjack">
   <requires>
     <import addon="xbmc.python" version="2.24.0"/>
   </requires>
