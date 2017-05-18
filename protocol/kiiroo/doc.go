@@ -30,9 +30,9 @@ Raw speed value between events is 100 - (hundredth sec + 10%) as %. Eg:
 	0.50 sec = 100-55 = 45%
 
 If raw speed is bigger then previous speed, then increase speed with 1/6 of the
-raw speed. Eg:
+difference. Eg:
 
-	Previous 50 and Raw 78 = 50+78/6 = 63%
+	Previous 50 and Raw 78 = 50+(78-50)/6 = 54%
 
 If raw speed is smaller then previous speed, then decrease speed with 1/2 of
 the raw speed. Eg:
