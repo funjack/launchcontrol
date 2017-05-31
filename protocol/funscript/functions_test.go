@@ -1,4 +1,4 @@
-package raw
+package funscript
 
 import (
 	"testing"
