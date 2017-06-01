@@ -11,37 +11,42 @@ import urllib2
 
 scripttypes = [
         {
-            "name"      : "raw", 
+            "name"      : "funscript",
+            "extensions": ["funscript"],
+            "mediaType" : "application/prs.funscript+json",
+        },
+        {
+            "name"      : "raw",
             "extensions": ["launch"],
             "mediaType" : "application/prs.launchraw+json",
         },
         {
-            "name"      : "kiiroo", 
+            "name"      : "kiiroo",
             "extensions": ["kiiroo"],
             "mediaType" : "text/prs.kiiroo",
         },
         {
-            "name"      : "realtouch", 
+            "name"      : "realtouch",
             "extensions": ["realtouch", "ott"],
             "mediaType" : "text/prs.realtouch",
         },
         {
-            "name"      : "vorze", 
+            "name"      : "vorze",
             "extensions": ["vorze"],
             "mediaType" : "text/prs.vorze",
         },
         {
-            "name"      : "json", 
+            "name"      : "json",
             "extensions": ["json"],
             "mediaType" : "application/json",
         },
         {
-            "name"      : "text", 
+            "name"      : "text",
             "extensions": ["txt"],
             "mediaType" : "text/plain",
         },
         {
-            "name"      : "csv", 
+            "name"      : "csv",
             "extensions": ["csv"],
             "mediaType" : "text/csv",
         },
@@ -156,7 +161,7 @@ class Client() :
 
     def Skip(self, time):
         """Skip jumps to a timecode.
-        
+
         Raises:
             NotNowException: Skip can not be performed now, eg because there
                 is no script loaded.
