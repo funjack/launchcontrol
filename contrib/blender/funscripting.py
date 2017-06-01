@@ -32,7 +32,7 @@
 bl_info = {
     "name": "Funscripting Addon",
     "author": "Funjack",
-    "version": (0, 0, 1),
+    "version": (0, 0, 2),
     "location": "Sequencer",
     "description": "Script Launch haptics data and export as Funscript.",
     "category": "Sequencer",
@@ -52,7 +52,8 @@ class FunscriptPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return len(context.selected_sequences) == 1
+        return context.selected_sequences is not None \
+                and len(context.selected_sequences) == 1
 
     def draw(self, context):
         layout = self.layout
