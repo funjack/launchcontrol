@@ -3,16 +3,17 @@ Funscripting Blender Addon
 
 Funscripting is an addon for Blender to 'script' Launch movements for a video.
 With this addon you can create your own scripts (in Funscript format) that can
-be played back by Launchcontrol for any movie you like.
+be played back by Launchcontrol.
 
 [Blender](https://www.blender.org/) is a very powerful free and open-source 3D
 editor suite, that comes with a video editor. Scrubbing through a video is very
-fast and easy. 
+fast and easy.
 
-This addon consists of a panel for the sequencer with percentage buttons
-representing Launch positions. This will insert the buttons value in a custom
-property on the selected strip and marks it as a keyframe. The export button
-will save this as a Funscript that can be played back using Launchcontrol.
+The addon consists of a panel for the Sequencer with percentage buttons
+representing Launch positions. Each button inserts the corresponding value into
+a custom property on the selected strip and marks it as a keyframe. The export
+button will save this as a Funscript file that can be played back using
+Launchcontrol.
 
 Installation
 ------------
@@ -25,6 +26,7 @@ Installation
 5. Click Install from File.
 6. Select the downloaded `funscripting.py`
 7. Mark the checkbox of `Funscripting Addon`
+8. Click `Save User Settings` to auto enable the addon on next startup
 
 If the above steps are not clear, this
 [stackexchange](https://blender.stackexchange.com/questions/1688/installing-an-addon)
@@ -34,7 +36,7 @@ Usage
 -----
 
 Don't Panic. Blender can be very overwhelming but you don't need to know what
-everything does to create a Funscript :)
+everything does in order to create a Funscript :)
 
 ### Switch to video editing layout
 
@@ -47,22 +49,22 @@ screen:
 Click on the `add` menu button in the Sequencer:
 ![Add](./doc/02-add-movie.jpg "Add")
 
-Select `movie`. Browse to your movie file and open it:
+Select `Movie`. Browse to your movie file and open it:
 ![Movie](./doc/03-add-movie.jpg "Movie")
 
-Select the video strip by right clicking on it. (You may see two strips, the
+Select the video strip by `right-clicking` on it. (You may see two strips, the
 top one represents the audio.):
 ![Select Strip](./doc/04-select-strip.jpg "Select Strip")
 
 ### Script movie
 
-Search the start position by left linking in the Sequence window and/or using
-the arrow keys on your keyboard. Then press the position number in the
-Funscript panel: 
+Search the start position by `left-clicking` in the Sequence window and/or
+using the `arrow keys` on your keyboard. Then press one of the position number
+in the Funscript panel:
 ![Seek Position](./doc/05-seek-insert.jpg "Seek Position")
 
 Search for the end of the move in the video and press the corresponding
-position number in the Funscript panel: 
+position number in the Funscript panel:
 ![Insert Position](./doc/06-seek-insert.jpg "Insert Position")
 
 To halt movement simply choose the same position as before to keep at that
