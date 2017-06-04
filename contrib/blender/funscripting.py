@@ -125,7 +125,7 @@ def create_funscript(keyframes):
         time = frame_to_ms(int(kf.co[0]))
         value = int(kf.co[1])
         script.append({"at": time, "pos": value})
-    return {"version": "1.0", "launch": {"data":script, "inverted":False}}
+    return {"version": "1.0", "inverted":False, "range": 100, "actions": script}
 
 def launch_keyframes(name):
     """Return all keyframes from all actions fcurves in prop 'launch'."""
