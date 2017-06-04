@@ -5,7 +5,7 @@ Funscript is Funjack's haptic script format. It's basically JSON encoded timed
 positions:
 
 	{
-                "version": "1.0",
+		"version": "1.0",
 		"inverted": false,
 		"range": 90,
 		"actions": [
