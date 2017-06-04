@@ -111,12 +111,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         // distance: amount to move percent (0-100).
         // speed: speed to move at in percent (20-100).
         _calcDuration: function(distance, speed) {
+	    var mil = Math.pow(speed/25000, -0.95);
+	    return mil/(90/distance);
+	    /*
             // TODO figure out the real timings and best way to calculate them.
             //
             // Rough measurements 'felt' like a log10... :) and putting 100% at
             // 300ms given a full stroke for now:
             var delayPerPercent = (Math.log10(100/speed) * 8.5 + 3);
             return distance * delayPerPercent;
+	    */
         },
 
         // stroke continues to move between two points at a set speed.

@@ -43,8 +43,8 @@ local clientConfig = {
 
 function descriptor()
   return {
-    title = "Launchcontrol 0.0.2",
-    version = "0.0.2",
+    title = "Launchcontrol 0.0.3",
+    version = "0.0.3",
     author = "Funjack",
     url = "https://github.com/funjack/launchcontrol/",
     shortdesc = "Launchcontrol",
@@ -274,6 +274,11 @@ end
 --[[ Launch client ]]--
 
 scriptTypes = {
+  {
+    name = "funscript",
+    extensions = {"funscript"},
+    mediaType = "application/prs.funscript+json",
+  },
   {
     name = "raw",
     extensions = {"launch"},

@@ -9,12 +9,20 @@ import (
 	"time"
 
 	"github.com/funjack/launchcontrol/protocol"
+	"github.com/funjack/launchcontrol/protocol/funscript"
 	"github.com/funjack/launchcontrol/protocol/kiiroo"
 	"github.com/funjack/launchcontrol/protocol/raw"
 )
 
 // Loaders contains all the registered ScriptLoaders.
 var Loaders = []Loader{
+	{
+		Loader: &funscript.Loader{},
+		ContentTypes: []string{
+			"application/prs.funscript+json",
+			"application/json",
+		},
+	},
 	{
 		Loader: protocol.LoaderFunc(raw.Load),
 		ContentTypes: []string{

@@ -25,8 +25,11 @@ Supported haptic script formats:
 
 | Format | Content Type | File extensions |
 | ------ | ------------ | --------------- |
+| [Funscript](https://godoc.org/github.com/funjack/launchcontrol/protocol/funscript) | `application/prs.funscript+json` | `.funscript` `.json` |
 | [Raw](https://godoc.org/github.com/funjack/launchcontrol/protocol/raw) | `application/prs.launchraw+json` | `.launch` `.json` |
 | [Kiiroo](https://godoc.org/github.com/funjack/launchcontrol/protocol/kiiroo) | `text/prs.kiiroo` | `.kiiroo` |
+
+Create your own Funscripts using the [Blender addon](https://github.com/funjack/launchcontrol/tree/master/contrib/blender).
 
 ## Downloads
 
