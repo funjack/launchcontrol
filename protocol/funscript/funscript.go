@@ -14,6 +14,10 @@ const (
 	// SpeedLimitMax is the fasts movement command possible. The Launch
 	// makes weird 'clicking' noises when moving at very fast speeds.
 	SpeedLimitMax = 80
+	// PositionMin is the lowest position possible.
+	PositionMin = 5
+	// PositionMax is the hight position possible.
+	PositionMax = 95
 	// Threshold is the minimum amount of time between actions.
 	Threshold = 100 * time.Millisecond
 )
@@ -51,53 +55,50 @@ func (r Range) Position(p int) int {
 
 // Stats when generated script.
 type Stats struct {
-	Count              uint64 // Amount of actions generated.
-	DistanceTotal      uint64 // Total distance that will be traveled.
-	SpeedTotal         uint64 // Accumulation of all commands speed param.
-	SpeedOverrideTotal int    // Number of times speed had to be limited.
-	SpeedOverrideFast  int    // Number of times generated speed was too fast.
-	SpeedOverrideSlow  int    // Number of times generated speed was too slow.
-	Delayed            int    // Number of actions that will be thresholded.
+	Count             uint64 // Amount of actions generated.
+	DistanceTotal     uint64 // Total distance that will be traveled.
+	SpeedTotal        uint64 // Accumulation of all commands speed param.
+	SpeedOverrideFast int    // Number of times generated speed was too fast.
+	SpeedOverrideSlow int    // Number of times generated speed was too slow.
+	Delayed           int    // Number of actions that will be thresholded.
 }
 
 // String returns a formatted.
 func (s Stats) String() string {
 	var fastPct, slowPct float64
-	if s.SpeedOverrideTotal > 0 {
+	overrideTotal := s.SpeedOverrideFast + s.SpeedOverrideSlow
+	if overrideTotal > 0 {
 		fastPct = float64(s.SpeedOverrideFast) /
-			float64(s.SpeedOverrideTotal) * 100
+			float64(overrideTotal) * 100
 		slowPct = float64(s.SpeedOverrideSlow) /
-			float64(s.SpeedOverrideTotal) * 100
+			float64(overrideTotal) * 100
 	}
-	avgSpeed := s.SpeedTotal / s.Count
+	var avgSpeed uint64
+	if s.Count > 0 {
+		avgSpeed = s.SpeedTotal / s.Count
+	}
 	return fmt.Sprintf("actions=%d (avgspeed=%d%%), delayed=%d, "+
 		"speedoverrides=%d (fast=%.2f%%,slow=%.2f%%)",
-		s.Count, avgSpeed, s.Delayed, s.SpeedOverrideTotal,
+		s.Count, avgSpeed, s.Delayed, overrideTotal,
 		fastPct, slowPct)
-}
-
-// TooFastInc increments the SpeedOveride values
-func (s *Stats) TooFastInc() {
-	s.SpeedOverrideFast++
-	s.SpeedOverrideTotal++
-}
-
-// TooSlowInc increments the SpeedOveride values
-func (s *Stats) TooSlowInc() {
-	s.SpeedOverrideSlow++
-	s.SpeedOverrideTotal++
 }
 
 // TimedActions creates timed Launch actions from the Scripts timed positions.
 // The minspd/maxspd arguments are Launch speed limits in percent. The
 // minpos/maxpos specify the position limits in percent.
-// The seconds return value are statistics on the script generation.
+// The second return value are statistics on the script generation.
 func (fs Script) TimedActions(minspd, maxspd, minpos, maxpos int) (s protocol.TimedActions, stat Stats) {
 	if minspd < SpeedLimitMin {
 		minspd = SpeedLimitMin
 	}
 	if maxspd > SpeedLimitMax {
 		maxspd = SpeedLimitMax
+	}
+	if minpos < PositionMin {
+		minpos = PositionMin
+	}
+	if maxpos > PositionMax {
+		maxpos = PositionMax
 	}
 	r := Range(maxpos - minpos)
 	if fs.Range != 0 && r > fs.Range {
@@ -141,10 +142,10 @@ func (fs Script) TimedActions(minspd, maxspd, minpos, maxpos int) (s protocol.Ti
 		speed := Speed(distance, timediff)
 		if speed > maxspd {
 			speed = maxspd
-			stat.TooFastInc()
+			stat.SpeedOverrideFast++
 		} else if speed < minspd {
 			speed = minspd
-			stat.TooSlowInc()
+			stat.SpeedOverrideSlow++
 		}
 		stat.SpeedTotal = stat.SpeedTotal + uint64(speed)
 		ta := protocol.TimedAction{

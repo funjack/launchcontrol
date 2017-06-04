@@ -7,7 +7,7 @@ positions:
 	{
                 "version": "1.0",
 		"inverted": false,
-		"range": 100,
+		"range": 90,
 		"actions": [
 			{"pos": 0, "at": 100},
 			{"pos": 100, "at": 500},
@@ -17,7 +17,7 @@ positions:
 
 	version: funscript version (optional, default="1.0")
 	inverted: positions are inverted (0=100,100=0) (optional, default=false)
-	range: range of moment to use in percent (0-100) (optional, default=100)
+	range: range of moment to use in percent (0-100) (optional, default=90)
 	actions: script for a Launch
 	  pos: position in percent (0-100)
 	  at : time to be at position in milliseconds
@@ -27,10 +27,14 @@ Movement range
 Implementations may override the range value specified in the script.
 
 Define min (bottom) and max (top) positions for the strokes. Defaults are:
-min=0 and max=range. The values for min and max must:
+min=5 and max=95. The values for min and max must:
 
 	(max - min) == range
-	(max - min) <= 100
+	(max - min) <= 90
+
+The defaults of 5/95 are based on the reverse engineering efforts of the Kiiroo
+protocol. It's not certain if 0/100 are safe to use, so for now better be safe
+then sorry.
 
 Speed algorithm
 
