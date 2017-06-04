@@ -13,7 +13,7 @@ positions:
 			{"pos": 100, "at": 500},
 			...
 		]
-        }
+	}
 
 	version: funscript version (optional, default="1.0")
 	inverted: positions are inverted (0=100,100=0) (optional, default=false)
