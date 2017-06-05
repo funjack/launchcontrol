@@ -86,6 +86,18 @@ Move the file next to a movie and make sure it has the `.funscript` file
 extension. Use Kodi or VLC with a Launchcontrol plugin to play. Here is a short
 [demo video](https://vid.me/HpwK).
 
+
+Shortcuts
+---------
+
+The following keyboard shortcuts are registered (focus must be on the Video
+Sequencer Editor):
+
+- `0-9`: Insert postion at 0% - 90% at current frame.
+- `-`  : Insert position at 100% at current frame.
+- `````  : Insert a copy of the previous stroke at current frame.
+- `=`  : Fill up until the current frame with copies of the previous stroke.
+
 Tips
 ----
 
