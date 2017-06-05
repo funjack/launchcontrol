@@ -41,6 +41,8 @@ bl_info = {
 import bpy
 import json
 
+addon_keymaps = []
+
 class FunscriptPanel(bpy.types.Panel):
     """Funscript UI panel.
 
@@ -87,9 +89,11 @@ class FunscriptPositionButton(bpy.types.Operator):
     """
     bl_idname = "funscript.position"
     bl_label = "Position"
+    bl_options = {'REGISTER', 'UNDO'}
     launchPosition = bpy.props.IntProperty()
 
     def execute(self, context):
+        print("inserting: %d" % self.launchPosition)
         scene = context.scene
         if len(context.selected_sequences) < 1:
             self.report({'ERROR_INVALID_CONTEXT'}, "No sequence selected.")
@@ -106,6 +110,7 @@ class FunscriptRepeatButton(bpy.types.Operator):
     """
     bl_idname = "funscript.repeat"
     bl_label = "Repeat stroke"
+    bl_options = {'REGISTER', 'UNDO'}
     launchPosition = bpy.props.IntProperty()
 
     def execute(self, context):
@@ -126,6 +131,7 @@ class FunscriptFillButton(bpy.types.Operator):
     """
     bl_idname = "funscript.fill"
     bl_label = "Fill stroke"
+    bl_options = {'REGISTER', 'UNDO'}
     launchPosition = bpy.props.IntProperty()
 
     def execute(self, context):
@@ -171,6 +177,7 @@ class FunscriptImport(bpy.types.Operator):
     """
     bl_idname = "funscript.import"
     bl_label = "Import Funscript on frame"
+    bl_options = {'REGISTER', 'UNDO'}
     filepath = bpy.props.StringProperty(subtype='FILE_PATH')
 
     def execute(self, context):
@@ -313,13 +320,57 @@ def register():
     bpy.utils.register_class(FunscriptImport)
     bpy.utils.register_class(FunscriptPanel)
 
+    # handle the keymap
+    wm = bpy.context.window_manager
+    kc = wm.keyconfigs.addon
+    if kc:
+        km = wm.keyconfigs.addon.keymaps.new(name='Sequencer', space_type='SEQUENCE_EDITOR')
+        kmi = km.keymap_items.new(FunscriptFillButton.bl_idname, 'EQUAL', 'PRESS')
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptRepeatButton.bl_idname, 'ACCENT_GRAVE', 'PRESS')
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'ZERO', 'PRESS')
+        kmi.properties.launchPosition = 0
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'ONE', 'PRESS')
+        kmi.properties.launchPosition = 10
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'TWO', 'PRESS')
+        kmi.properties.launchPosition = 20
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'THREE', 'PRESS')
+        kmi.properties.launchPosition = 30
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'FOUR', 'PRESS')
+        kmi.properties.launchPosition = 40
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'FIVE', 'PRESS')
+        kmi.properties.launchPosition = 50
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'SIX', 'PRESS')
+        kmi.properties.launchPosition = 60
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'SEVEN', 'PRESS')
+        kmi.properties.launchPosition = 70
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'EIGHT', 'PRESS')
+        kmi.properties.launchPosition = 80
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'NINE', 'PRESS')
+        kmi.properties.launchPosition = 90
+        addon_keymaps.append((km, kmi))
+
 def unregister():
-    bpy.utils.unregister_class(FunscriptPositionButton)
-    bpy.utils.unregister_class(FunscriptRepeatButton)
-    bpy.utils.unregister_class(FunscriptFillButton)
-    bpy.utils.unregister_class(FunscriptExport)
-    bpy.utils.unregister_class(FunscriptImport)
+    for km, kmi in addon_keymaps:
+        km.keymap_items.remove(kmi)
+    addon_keymaps.clear()
+
     bpy.utils.unregister_class(FunscriptPanel)
+    bpy.utils.unregister_class(FunscriptImport)
+    bpy.utils.unregister_class(FunscriptExport)
+    bpy.utils.unregister_class(FunscriptFillButton)
+    bpy.utils.unregister_class(FunscriptRepeatButton)
+    bpy.utils.unregister_class(FunscriptPositionButton)
 
 if __name__ == "__main__":
     register()
