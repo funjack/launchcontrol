@@ -32,7 +32,7 @@
 bl_info = {
     "name": "Funscripting Addon",
     "author": "Funjack",
-    "version": (0, 0, 2),
+    "version": (0, 0, 3),
     "location": "Sequencer",
     "description": "Script Launch haptics data and export as Funscript.",
     "category": "Sequencer",
@@ -40,6 +40,8 @@ bl_info = {
 
 import bpy
 import json
+
+addon_keymaps = []
 
 class FunscriptPanel(bpy.types.Panel):
     """Funscript UI panel.
@@ -66,8 +68,16 @@ class FunscriptPanel(bpy.types.Panel):
             else:
                 for i in range(x,x+30,10):
                     row.operator("funscript.position", text=str(i)).launchPosition=i
-
-        layout.label(text="Export Funscript")
+        layout.label(text="Generate")
+        row = layout.row(align=True)
+        row.alignment = 'EXPAND'
+        row.operator("funscript.repeat")
+        row.operator("funscript.fill")
+        layout.label(text="Import funscript")
+        row = layout.row(align=True)
+        row.alignment = 'EXPAND'
+        row.operator("funscript.import")
+        layout.label(text="Export funscript")
         row = layout.row(align=True)
         row.alignment = 'EXPAND'
         row.operator("funscript.export")
@@ -79,6 +89,28 @@ class FunscriptPositionButton(bpy.types.Operator):
     """
     bl_idname = "funscript.position"
     bl_label = "Position"
+    bl_options = {'REGISTER', 'UNDO'}
+    launchPosition = bpy.props.IntProperty()
+
+    def execute(self, context):
+        print("inserting: %d" % self.launchPosition)
+        scene = context.scene
+        if len(context.selected_sequences) < 1:
+            self.report({'ERROR_INVALID_CONTEXT'}, "No sequence selected.")
+            return{'CANCELLED'}
+        seq = context.selected_sequences[0]
+        insert_position(seq, self.launchPosition, scene.frame_current)
+        scene.frame_set(scene.frame_current)
+        return{'FINISHED'}
+
+class FunscriptRepeatButton(bpy.types.Operator):
+    """Repeat last stroke button.
+
+    Button that will repeat the last stroke on the selected sequence.
+    """
+    bl_idname = "funscript.repeat"
+    bl_label = "Repeat stroke"
+    bl_options = {'REGISTER', 'UNDO'}
     launchPosition = bpy.props.IntProperty()
 
     def execute(self, context):
@@ -87,8 +119,29 @@ class FunscriptPositionButton(bpy.types.Operator):
             self.report({'ERROR_INVALID_CONTEXT'}, "No sequence selected.")
             return{'CANCELLED'}
         seq = context.selected_sequences[0]
-        seq["launch"] = self.launchPosition
-        seq.keyframe_insert(data_path='["launch"]', frame=scene.frame_current)
+        lastframe = repeat_stroke(seq, scene.frame_current)
+        scene.frame_set(lastframe)
+        return{'FINISHED'}
+
+class FunscriptFillButton(bpy.types.Operator):
+    """Fill last stroke button.
+
+    Button that will repeat the last stroke on the selected sequence until the
+    current frame is reached.
+    """
+    bl_idname = "funscript.fill"
+    bl_label = "Fill stroke"
+    bl_options = {'REGISTER', 'UNDO'}
+    launchPosition = bpy.props.IntProperty()
+
+    def execute(self, context):
+        scene = context.scene
+        if len(context.selected_sequences) < 1:
+            self.report({'ERROR_INVALID_CONTEXT'}, "No sequence selected.")
+            return{'CANCELLED'}
+        seq = context.selected_sequences[0]
+        lastframe = repeat_fill_stroke(seq, scene.frame_current)
+        scene.frame_set(lastframe)
         return{'FINISHED'}
 
 class FunscriptExport(bpy.types.Operator):
@@ -116,7 +169,110 @@ class FunscriptExport(bpy.types.Operator):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
 
-# TODO: Would be cool to also load a funscript back as action keyframes.
+class FunscriptImport(bpy.types.Operator):
+    """Import as Funscript file button.
+
+    Button that imports Launch position keyframes in the sequences from a
+    Funscript file.
+    """
+    bl_idname = "funscript.import"
+    bl_label = "Import Funscript on frame"
+    bl_options = {'REGISTER', 'UNDO'}
+    filepath = bpy.props.StringProperty(subtype='FILE_PATH')
+
+    def execute(self, context):
+        if len(context.selected_sequences) < 1:
+            self.report({'ERROR_INVALID_CONTEXT'}, "No sequence selected.")
+            return{'CANCELLED'}
+        seq = context.selected_sequences[0]
+        with open(self.filepath) as infile:
+            fs = json.load(infile)
+            if not "actions" in fs:
+                self.report({'ERROR_INVALID_INPUT'}, "Input is not valid funscript.")
+                return{'CANCELLED'}
+            insert_actions(seq, fs["actions"], context.scene.frame_current)
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+def insert_actions(seq, actions, offset=0):
+    """Insert into seq positions from the actions dict"""
+    for a in actions:
+        frame = ms_to_frame(a["at"]) + offset
+        insert_position(seq, a["pos"], frame)
+
+def insert_stroke(seq, stroke, offset=0):
+    """Insert into seq positions from the stroke dict"""
+    frame = offset
+    for i, p in enumerate(stroke):
+        frame = p["frame"] + offset
+        if i == 0:
+            # Do not override a keyframe at the start of the insert position.
+            if launch_keyframe(seq.name, frame) is not None:
+                continue
+        # XXX Maybe we should also remove any keyframes that already exists in
+        # the frame window of the new stroke?
+        insert_position(seq, p["value"], frame)
+    return frame
+
+def insert_position(seq, position, frame):
+    """Inserts in seq a keyframe with value position on frame."""
+    seq["launch"] = position
+    seq.keyframe_insert(data_path='["launch"]', frame=frame)
+
+def repeat_stroke(seq, frame_current):
+    """Repeat the last stroke on the current frame"""
+    stroke = last_stroke(seq, frame_current)
+    if len(stroke) < 3:
+        return
+    return insert_stroke(seq, stroke, frame_current)
+
+def repeat_fill_stroke(seq, frame_end):
+    """Fill the the last stroke before end_frame until end_frame."""
+    stroke = last_stroke(seq, frame_end)
+    if len(stroke) < 3:
+        return
+    frame = frame_end
+    keyframes = launch_keyframes(seq.name)
+    for kf in reversed(keyframes):
+        frame = kf.co[0]
+        if frame > frame_end:
+            continue
+        if frame <= frame_end:
+            break
+    return fill_stroke(seq, stroke, frame, frame_end)
+ 
+def fill_stroke(seq, stroke, frame_start, frame_end):
+    """Fill between frame_start and frame_end with stroke."""
+    if len(stroke) < 3:
+        return
+    frame = frame_start
+    while frame + stroke[-1]["frame"] < frame_end:
+        frame = insert_stroke(seq, stroke, frame)
+    return frame
+
+def last_stroke(seq, since_frame):
+    """Returns the last stroke since frame."""
+    keyframes = launch_keyframes(seq.name)
+    stroke = []
+    for kf in reversed(keyframes):
+        frame = kf.co[0]
+        value = kf.co[1]
+        if frame > since_frame:
+            continue
+        if frame <= since_frame:
+            stroke.append({"frame":frame, "value":value})
+        if len(stroke) == 3:
+            break
+    if len(stroke) < 3:
+        return
+    startframe = stroke[1]["frame"] - stroke[2]["frame"]
+    endframe = stroke[0]["frame"] - stroke[2]["frame"]
+    return [ {"frame": 0, "value": stroke[2]["value"] },
+             {"frame": startframe, "value": stroke[1]["value"] },
+             {"frame": endframe, "value": stroke[0]["value"] } ]
 
 def create_funscript(keyframes):
     """Create Funscript from keyframes."""
@@ -125,7 +281,7 @@ def create_funscript(keyframes):
         time = frame_to_ms(int(kf.co[0]))
         value = int(kf.co[1])
         script.append({"at": time, "pos": value})
-    return {"version": "1.0", "inverted":False, "range": 100, "actions": script}
+    return {"version": "1.0", "inverted": True, "range": 100, "actions": script}
 
 def launch_keyframes(name):
     """Return all keyframes from all actions fcurves in prop 'launch'."""
@@ -134,22 +290,87 @@ def launch_keyframes(name):
             if f.data_path.endswith('["%s"]["launch"]' % name):
                 return f.keyframe_points
 
+def launch_keyframe(name, frame):
+    """Returns the keyframe value at frame."""
+    keyframes = launch_keyframes(name)
+    for kf in keyframes:
+        if kf.co[0] == frame:
+            return kf.co[1]
+    return None
+
 def frame_to_ms(frame):
     """Returns time position in milliseconds for the given frame number."""
     scene = bpy.context.scene
     fps = scene.render.fps
     fps_base = scene.render.fps_base
-    return int((frame-1)/fps*fps_base*1000)
+    return round((frame-1)/fps*fps_base*1000)
+
+def ms_to_frame(time):
+    """Returns frame number for the given time position in milliseconds."""
+    scene = bpy.context.scene
+    fps = scene.render.fps
+    fps_base = scene.render.fps_base
+    return round(time/1000/fps_base*fps+1)
 
 def register():
     bpy.utils.register_class(FunscriptPositionButton)
+    bpy.utils.register_class(FunscriptRepeatButton)
+    bpy.utils.register_class(FunscriptFillButton)
     bpy.utils.register_class(FunscriptExport)
+    bpy.utils.register_class(FunscriptImport)
     bpy.utils.register_class(FunscriptPanel)
 
+    # handle the keymap
+    wm = bpy.context.window_manager
+    kc = wm.keyconfigs.addon
+    if kc:
+        km = wm.keyconfigs.addon.keymaps.new(name='Sequencer', space_type='SEQUENCE_EDITOR')
+        kmi = km.keymap_items.new(FunscriptFillButton.bl_idname, 'EQUAL', 'PRESS')
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptRepeatButton.bl_idname, 'ACCENT_GRAVE', 'PRESS')
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'ZERO', 'PRESS')
+        kmi.properties.launchPosition = 0
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'ONE', 'PRESS')
+        kmi.properties.launchPosition = 10
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'TWO', 'PRESS')
+        kmi.properties.launchPosition = 20
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'THREE', 'PRESS')
+        kmi.properties.launchPosition = 30
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'FOUR', 'PRESS')
+        kmi.properties.launchPosition = 40
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'FIVE', 'PRESS')
+        kmi.properties.launchPosition = 50
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'SIX', 'PRESS')
+        kmi.properties.launchPosition = 60
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'SEVEN', 'PRESS')
+        kmi.properties.launchPosition = 70
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'EIGHT', 'PRESS')
+        kmi.properties.launchPosition = 80
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'NINE', 'PRESS')
+        kmi.properties.launchPosition = 90
+        addon_keymaps.append((km, kmi))
+
 def unregister():
-    bpy.utils.unregister_class(FunscriptPositionButton)
-    bpy.utils.unregister_class(FunscriptExport)
+    for km, kmi in addon_keymaps:
+        km.keymap_items.remove(kmi)
+    addon_keymaps.clear()
+
     bpy.utils.unregister_class(FunscriptPanel)
+    bpy.utils.unregister_class(FunscriptImport)
+    bpy.utils.unregister_class(FunscriptExport)
+    bpy.utils.unregister_class(FunscriptFillButton)
+    bpy.utils.unregister_class(FunscriptRepeatButton)
+    bpy.utils.unregister_class(FunscriptPositionButton)
 
 if __name__ == "__main__":
     register()
