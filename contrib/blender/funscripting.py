@@ -32,7 +32,7 @@
 bl_info = {
     "name": "Funscripting Addon",
     "author": "Funjack",
-    "version": (0, 0, 2),
+    "version": (0, 0, 3),
     "location": "Sequencer",
     "description": "Script Launch haptics data and export as Funscript.",
     "category": "Sequencer",
@@ -67,7 +67,11 @@ class FunscriptPanel(bpy.types.Panel):
                 for i in range(x,x+30,10):
                     row.operator("funscript.position", text=str(i)).launchPosition=i
 
-        layout.label(text="Export Funscript")
+        layout.label(text="Import funscript")
+        row = layout.row(align=True)
+        row.alignment = 'EXPAND'
+        row.operator("funscript.import")
+        layout.label(text="Export funscript")
         row = layout.row(align=True)
         row.alignment = 'EXPAND'
         row.operator("funscript.export")
@@ -87,8 +91,7 @@ class FunscriptPositionButton(bpy.types.Operator):
             self.report({'ERROR_INVALID_CONTEXT'}, "No sequence selected.")
             return{'CANCELLED'}
         seq = context.selected_sequences[0]
-        seq["launch"] = self.launchPosition
-        seq.keyframe_insert(data_path='["launch"]', frame=scene.frame_current)
+        insert_position(seq, self.launchPosition, scene.frame_current)
         return{'FINISHED'}
 
 class FunscriptExport(bpy.types.Operator):
@@ -116,7 +119,43 @@ class FunscriptExport(bpy.types.Operator):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
 
-# TODO: Would be cool to also load a funscript back as action keyframes.
+class FunscriptImport(bpy.types.Operator):
+    """Import as Funscript file button.
+
+    Button that imports Launch position keyframes in the sequences from a
+    Funscript file.
+    """
+    bl_idname = "funscript.import"
+    bl_label = "Import Funscript on frame"
+    filepath = bpy.props.StringProperty(subtype='FILE_PATH')
+
+    def execute(self, context):
+        if len(context.selected_sequences) < 1:
+            self.report({'ERROR_INVALID_CONTEXT'}, "No sequence selected.")
+            return{'CANCELLED'}
+        seq = context.selected_sequences[0]
+        with open(self.filepath) as infile:
+            fs = json.load(infile)
+            if not "actions" in fs:
+                self.report({'ERROR_INVALID_INPUT'}, "Input is not valid funscript.")
+                return{'CANCELLED'}
+            insert_actions(seq, fs["actions"], context.scene.frame_current)
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+def insert_actions(seq, actions, offset=0):
+    """Insert into seq positions from actions dict"""
+    for a in actions:
+        frame = ms_to_frame(a["at"]) + offset
+        insert_position(seq, a["pos"], frame)
+
+def insert_position(seq, position, frame):
+    """Inserts in seq a keyframe with value position on frame."""
+    seq["launch"] = position
+    seq.keyframe_insert(data_path='["launch"]', frame=frame)
 
 def create_funscript(keyframes):
     """Create Funscript from keyframes."""
@@ -125,7 +164,7 @@ def create_funscript(keyframes):
         time = frame_to_ms(int(kf.co[0]))
         value = int(kf.co[1])
         script.append({"at": time, "pos": value})
-    return {"version": "1.0", "inverted":False, "range": 100, "actions": script}
+    return {"version": "1.0", "inverted": True, "range": 100, "actions": script}
 
 def launch_keyframes(name):
     """Return all keyframes from all actions fcurves in prop 'launch'."""
@@ -139,16 +178,26 @@ def frame_to_ms(frame):
     scene = bpy.context.scene
     fps = scene.render.fps
     fps_base = scene.render.fps_base
-    return int((frame-1)/fps*fps_base*1000)
+    return round((frame-1)/fps*fps_base*1000)
+
+def ms_to_frame(time):
+    """Returns frame number for the given time position in milliseconds."""
+    scene = bpy.context.scene
+    fps = scene.render.fps
+    fps_base = scene.render.fps_base
+    return round(time/1000/fps_base*fps+1)
+
 
 def register():
     bpy.utils.register_class(FunscriptPositionButton)
     bpy.utils.register_class(FunscriptExport)
+    bpy.utils.register_class(FunscriptImport)
     bpy.utils.register_class(FunscriptPanel)
 
 def unregister():
     bpy.utils.unregister_class(FunscriptPositionButton)
     bpy.utils.unregister_class(FunscriptExport)
+    bpy.utils.unregister_class(FunscriptImport)
     bpy.utils.unregister_class(FunscriptPanel)
 
 if __name__ == "__main__":
