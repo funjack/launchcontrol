@@ -359,6 +359,9 @@ def register():
         kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'NINE', 'PRESS')
         kmi.properties.launchPosition = 90
         addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'MINUS', 'PRESS')
+        kmi.properties.launchPosition = 100
+        addon_keymaps.append((km, kmi))
 
 def unregister():
     for km, kmi in addon_keymaps:
