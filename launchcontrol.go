@@ -2,8 +2,13 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"encoding/pem"
+	"errors"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -24,6 +29,8 @@ import (
 var (
 	listen   = flag.String("listen", "127.0.0.1:6969", "listen address")
 	buttplug = flag.String("buttplug", "", "buttplug server websocket address (experimental)")
+	ca       = flag.String("ca", "", "certificate authority in PEM format")
+	insecure = flag.Bool("insecure", false, "skip certificate verification")
 	noact    = flag.Bool("noact", false, "simulate launch on console")
 	lics     = flag.Bool("licenses", false, "show licenses")
 	ver      = flag.Bool("version", false, "show version")
@@ -54,8 +61,12 @@ func main() {
 	if *noact {
 		l = &launchMock{}
 	} else if *buttplug != "" {
+		tlscfg, err := createTLSConfig(*ca, *insecure)
+		if err != nil {
+			log.Fatalf("error creating tls config: %v", err)
+		}
 		ctx := context.Background()
-		l = golaunch.NewButtplugLaunch(ctx, *buttplug, "Launchcontrol")
+		l = golaunch.NewButtplugLaunch(ctx, *buttplug, "Launchcontrol", tlscfg)
 	} else {
 		l = golaunch.NewLaunch()
 		defer l.Disconnect()
@@ -85,4 +96,40 @@ func main() {
 
 	log.Printf("Listening on %s\n", *listen)
 	log.Fatal(http.ListenAndServe(*listen, nil))
+}
+
+// createTLSConfig creates a configuration trusting certs signed by the ca or
+// skip all tls verification.
+func createTLSConfig(ca string, insecure bool) (*tls.Config, error) {
+	tlscfg := new(tls.Config)
+	pool := x509.NewCertPool()
+	if ca != "" {
+		cacert, err := loadPEMFile(ca)
+		if err != nil {
+			return tlscfg, err
+		}
+		pool.AddCert(cacert)
+		tlscfg.RootCAs = pool
+	}
+	if insecure {
+		tlscfg.InsecureSkipVerify = true
+	}
+	return tlscfg, nil
+}
+
+// loadCaFile will load the certificate from specified PEM file.
+func loadPEMFile(file string) (cert *x509.Certificate, err error) {
+	f, err := ioutil.ReadFile(file)
+	if err != nil {
+		return
+	}
+	p, _ := pem.Decode(f)
+	if p == nil {
+		return cert, errors.New("no pem data found")
+	}
+	cert, err = x509.ParseCertificate(p.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	return cert, nil
 }
