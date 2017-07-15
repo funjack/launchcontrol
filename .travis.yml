@@ -20,6 +20,8 @@ before_deploy:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then GOOS=linux GOARCH=amd64 go build -o launchcontrol_linux_amd64; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then GOOS=linux GOARCH=386 go build -o launchcontrol_linux_386; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then GOOS=linux GOARCH=arm go build -o launchcontrol_linux_arm; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then GOOS=windows GOARCH=amd64 go build -o launchcontrol_windows_amd64.exe; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then GOOS=windows GOARCH=386 go build -o launchcontrol_windows_386.exe; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then GOOS=darwin GOARCH=amd64 go build -o launchcontrol_darwin_amd64; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make -C ./contrib/kodi/ script.service.launchcontrol.zip; fi
 deploy:
@@ -31,6 +33,8 @@ deploy:
   - launchcontrol_linux_amd64
   - launchcontrol_linux_386
   - launchcontrol_linux_arm
+  - launchcontrol_windows_amd64.exe
+  - launchcontrol_windows_386.exe
   - contrib/kodi/script.service.launchcontrol.zip
   - contrib/vlc/launchcontrol.lua
   on:
