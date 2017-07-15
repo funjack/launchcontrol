@@ -69,22 +69,22 @@
 			"revisionTime": "2017-02-27T21:27:28Z"
 		},
 		{
-			"checksumSHA1": "+iSrjAnQTH4gMxJ4/xMSACdUBko=",
+			"checksumSHA1": "S2HRScT3VPsvCwuys7f3Vq1/qg8=",
 			"path": "github.com/funjack/golaunch",
-			"revision": "bad4be9be647c2a49b19f8bfc3a1770de8af12b4",
-			"revisionTime": "2017-07-15T00:12:07Z"
+			"revision": "24e74ede00b42327b219144e2d265523fe88005a",
+			"revisionTime": "2017-07-15T22:33:29Z"
 		},
 		{
-			"checksumSHA1": "txTSI3is9CRzrGx11O76qIFBPNc=",
+			"checksumSHA1": "wVpLWo71/5NhAi7K51s5HMWLuPo=",
 			"path": "github.com/funjack/golibbuttplug",
-			"revision": "1e01f2b559e80d3adad81cc4ad8aff2554603d4b",
-			"revisionTime": "2017-07-15T01:36:18Z"
+			"revision": "edd6fd291df9171fccb5f6cb89818a32870d14dc",
+			"revisionTime": "2017-07-15T22:29:21Z"
 		},
 		{
 			"checksumSHA1": "aV+zGEA/8WwChIGMXgRuJnI/kqU=",
 			"path": "github.com/funjack/golibbuttplug/message",
-			"revision": "1e01f2b559e80d3adad81cc4ad8aff2554603d4b",
-			"revisionTime": "2017-07-15T01:36:18Z"
+			"revision": "edd6fd291df9171fccb5f6cb89818a32870d14dc",
+			"revisionTime": "2017-07-15T22:29:21Z"
 		},
 		{
 			"checksumSHA1": "GD6bB4d/l4Qf/r1/nlZSplzJdZg=",
