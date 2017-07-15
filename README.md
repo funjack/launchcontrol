@@ -51,6 +51,7 @@ for the latest binary downloads.
 | `launchcontrol_windows_386`        | Windows (32-bit) **Buttplug only!** |
 | `script.service.launchcontrol.zip` | Kodi Addon                          |
 | `launchcontrol.lua`                | VLC Extension                       |
+| `funscripting.py`                  | [Blender addon](https://github.com/funjack/launchcontrol/tree/master/contrib/blender) |
 
 ## Build
 

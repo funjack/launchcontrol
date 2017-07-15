@@ -37,6 +37,7 @@ deploy:
   - launchcontrol_windows_386.exe
   - contrib/kodi/script.service.launchcontrol.zip
   - contrib/vlc/launchcontrol.lua
+  - contrib/blender/funscripting.py
   on:
     tags: true
     repo: funjack/launchcontrol
