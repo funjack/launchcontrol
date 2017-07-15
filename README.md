@@ -15,6 +15,11 @@ The main platform for Launchcontrol is Linux, but it has been successfully
 tested on Mac OS X. Works great on a Raspberry Pi with
 [LibreELEC](https://libreelec.tv/) using the Kodi addon.
 
+Windows versions (**experimental!**) require (at time of writing, yet to be
+released) [Buttplug](https://buttplug.io/) Websocket server. Check out the
+Metafetish [blog](https://www.metafetish.com/) and
+[forums](https://metafetish.club/) for the latest status.
+
 The Kodi and VLC addons should work on all platforms (Linux, Mac and Windows.)
 
 Requires a Launch with (at least) firmware 1.2.
@@ -36,14 +41,16 @@ Create your own Funscripts using the [Blender addon](https://github.com/funjack/
 Check the [releases](https://github.com/funjack/launchcontrol/releases) page
 for the latest binary downloads.
 
-| Filename                           | Description              |
-| ---------------------------------- | ------------------------ |
-| `launchcontrol_linux_amd64`        | Linux (64-bit)           |
-| `launchcontrol_linux_386`          | Linux (32-bit)           |
-| `launchcontrol_darwin_amd64`       | Mac OS X                 |
-| `launchcontrol_linux_arm`          | Linux ARM (Raspberry Pi) |
-| `script.service.launchcontrol.zip` | Kodi Addon               |
-| `launchcontrol.lua`                | VLC Extension            |
+| Filename                           | Description                         |
+| ---------------------------------- | ----------------------------------- |
+| `launchcontrol_linux_amd64`        | Linux (64-bit)                      |
+| `launchcontrol_linux_386`          | Linux (32-bit)                      |
+| `launchcontrol_darwin_amd64`       | Mac OS X                            |
+| `launchcontrol_linux_arm`          | Linux ARM (Raspberry Pi)            |
+| `launchcontrol_windows_amd64`      | Windows (64-bit) **Buttplug only!** |
+| `launchcontrol_windows_386`        | Windows (32-bit) **Buttplug only!** |
+| `script.service.launchcontrol.zip` | Kodi Addon                          |
+| `launchcontrol.lua`                | VLC Extension                       |
 
 ## Build
 
@@ -55,11 +62,18 @@ sudo setcap 'cap_net_raw,cap_net_admin=eip' ./launchcontrol
 
 ## Usage
 
+### Start using native BLE
 ```sh
 # Start server (listening on localhost:6969 by default)
 ./launchcontrol
 ```
 
+### Start using Buttplug Websocket Server (experimental!)
+```sh
+./launchcontrol -buttplug ws://localhost:12345/buttplug
+```
+
+### Execute commands on HTTP endpoint usig cURL
 ```sh
 # Load and play script
 curl -XPOST -H "Content-Type: text/prs.kiiroo" --data-ascii \
