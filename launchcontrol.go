@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -21,10 +22,11 @@ import (
 //go:generate go run tools/gen-version.go
 
 var (
-	listen = flag.String("listen", "127.0.0.1:6969", "listen address")
-	noact  = flag.Bool("noact", false, "simulate launch on console")
-	lics   = flag.Bool("licenses", false, "show licenses")
-	ver    = flag.Bool("version", false, "show version")
+	listen   = flag.String("listen", "127.0.0.1:6969", "listen address")
+	buttplug = flag.String("buttplug", "", "buttplug server websocket address (experimental)")
+	noact    = flag.Bool("noact", false, "simulate launch on console")
+	lics     = flag.Bool("licenses", false, "show licenses")
+	ver      = flag.Bool("version", false, "show version")
 )
 
 func logger(h http.Handler) http.Handler {
@@ -51,6 +53,9 @@ func main() {
 	var l golaunch.Launch
 	if *noact {
 		l = &launchMock{}
+	} else if *buttplug != "" {
+		ctx := context.Background()
+		l = golaunch.NewButtplugLaunch(ctx, *buttplug, "Launchcontrol")
 	} else {
 		l = golaunch.NewLaunch()
 		defer l.Disconnect()
