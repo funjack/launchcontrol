@@ -32,7 +32,7 @@
 bl_info = {
     "name": "Funscripting Addon",
     "author": "Funjack",
-    "version": (0, 0, 3),
+    "version": (0, 0, 4),
     "location": "Sequencer",
     "description": "Script Launch haptics data and export as Funscript.",
     "category": "Sequencer",
@@ -111,7 +111,6 @@ class FunscriptRepeatButton(bpy.types.Operator):
     bl_idname = "funscript.repeat"
     bl_label = "Repeat stroke"
     bl_options = {'REGISTER', 'UNDO'}
-    launchPosition = bpy.props.IntProperty()
 
     def execute(self, context):
         scene = context.scene
@@ -132,7 +131,6 @@ class FunscriptFillButton(bpy.types.Operator):
     bl_idname = "funscript.fill"
     bl_label = "Fill stroke"
     bl_options = {'REGISTER', 'UNDO'}
-    launchPosition = bpy.props.IntProperty()
 
     def execute(self, context):
         scene = context.scene
@@ -153,6 +151,8 @@ class FunscriptExport(bpy.types.Operator):
     bl_idname = "funscript.export"
     bl_label = "Export as Funscript"
     filepath = bpy.props.StringProperty(subtype='FILE_PATH')
+    inverted = bpy.props.BoolProperty(name="inverted",
+        description="Flip up and down positions", default=False)
 
     def execute(self, context):
         if len(context.selected_sequences) < 1:
@@ -160,10 +160,14 @@ class FunscriptExport(bpy.types.Operator):
             return{'CANCELLED'}
         seq = context.selected_sequences[0]
         keyframes = launch_keyframes(seq.name)
-        script = create_funscript(keyframes)
+        script = create_funscript(keyframes, self.inverted)
         with open(self.filepath, 'w') as outfile:
             json.dump(script, outfile)
         return {'FINISHED'}
+
+    def draw(self,context):
+        layout = self.layout
+        layout.prop(self, "inverted", text="Inverted")
 
     def invoke(self, context, event):
         context.window_manager.fileselect_add(self)
@@ -225,14 +229,14 @@ def insert_position(seq, position, frame):
 def repeat_stroke(seq, frame_current):
     """Repeat the last stroke on the current frame"""
     stroke = last_stroke(seq, frame_current)
-    if len(stroke) < 3:
+    if stroke is None or len(stroke) < 3:
         return
     return insert_stroke(seq, stroke, frame_current)
 
 def repeat_fill_stroke(seq, frame_end):
     """Fill the the last stroke before end_frame until end_frame."""
     stroke = last_stroke(seq, frame_end)
-    if len(stroke) < 3:
+    if stroke is None or len(stroke) < 3:
         return
     frame = frame_end
     keyframes = launch_keyframes(seq.name)
@@ -243,10 +247,10 @@ def repeat_fill_stroke(seq, frame_end):
         if frame <= frame_end:
             break
     return fill_stroke(seq, stroke, frame, frame_end)
- 
+
 def fill_stroke(seq, stroke, frame_start, frame_end):
     """Fill between frame_start and frame_end with stroke."""
-    if len(stroke) < 3:
+    if stroke is None or len(stroke) < 3:
         return
     frame = frame_start
     while frame + stroke[-1]["frame"] < frame_end:
@@ -274,14 +278,14 @@ def last_stroke(seq, since_frame):
              {"frame": startframe, "value": stroke[1]["value"] },
              {"frame": endframe, "value": stroke[0]["value"] } ]
 
-def create_funscript(keyframes):
+def create_funscript(keyframes, inverted):
     """Create Funscript from keyframes."""
     script = []
     for kf in keyframes:
         time = frame_to_ms(int(kf.co[0]))
         value = int(kf.co[1])
         script.append({"at": time, "pos": value})
-    return {"version": "1.0", "inverted": True, "range": 100, "actions": script}
+    return {"version": "1.0", "inverted": inverted, "range": 100, "actions": script}
 
 def launch_keyframes(name):
     """Return all keyframes from all actions fcurves in prop 'launch'."""
