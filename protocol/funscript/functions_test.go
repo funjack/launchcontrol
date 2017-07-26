@@ -84,6 +84,18 @@ var MeasurementsTestTable = []Measurement{
 		Speed:    60,
 		Duration: time.Millisecond * 165,
 	},
+	{
+		// Case 12
+		Distance: 0,
+		Speed:    0,
+		Duration: 0,
+	},
+	{
+		// Case 13
+		Distance: 100,
+		Speed:    100,
+		Duration: time.Millisecond * 210,
+	},
 }
 
 type timeTolerance time.Duration
