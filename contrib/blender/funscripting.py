@@ -32,7 +32,7 @@
 bl_info = {
     "name": "Funscripting Addon",
     "author": "Funjack",
-    "version": (0, 0, 4),
+    "version": (0, 0, 5),
     "location": "Sequencer",
     "description": "Script Launch haptics data and export as Funscript.",
     "category": "Sequencer",
@@ -336,34 +336,67 @@ def register():
         kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'ZERO', 'PRESS')
         kmi.properties.launchPosition = 0
         addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'NUMPAD_0', 'PRESS')
+        kmi.properties.launchPosition = 0
+        addon_keymaps.append((km, kmi))
         kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'ONE', 'PRESS')
+        kmi.properties.launchPosition = 10
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'NUMPAD_1', 'PRESS')
         kmi.properties.launchPosition = 10
         addon_keymaps.append((km, kmi))
         kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'TWO', 'PRESS')
         kmi.properties.launchPosition = 20
         addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'NUMPAD_2', 'PRESS')
+        kmi.properties.launchPosition = 20
+        addon_keymaps.append((km, kmi))
         kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'THREE', 'PRESS')
+        kmi.properties.launchPosition = 30
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'NUMPAD_3', 'PRESS')
         kmi.properties.launchPosition = 30
         addon_keymaps.append((km, kmi))
         kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'FOUR', 'PRESS')
         kmi.properties.launchPosition = 40
         addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'NUMPAD_4', 'PRESS')
+        kmi.properties.launchPosition = 40
+        addon_keymaps.append((km, kmi))
         kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'FIVE', 'PRESS')
+        kmi.properties.launchPosition = 50
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'NUMPAD_5', 'PRESS')
         kmi.properties.launchPosition = 50
         addon_keymaps.append((km, kmi))
         kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'SIX', 'PRESS')
         kmi.properties.launchPosition = 60
         addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'NUMPAD_6', 'PRESS')
+        kmi.properties.launchPosition = 60
+        addon_keymaps.append((km, kmi))
         kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'SEVEN', 'PRESS')
+        kmi.properties.launchPosition = 70
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'NUMPAD_7', 'PRESS')
         kmi.properties.launchPosition = 70
         addon_keymaps.append((km, kmi))
         kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'EIGHT', 'PRESS')
         kmi.properties.launchPosition = 80
         addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'NUMPAD_8', 'PRESS')
+        kmi.properties.launchPosition = 80
+        addon_keymaps.append((km, kmi))
         kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'NINE', 'PRESS')
         kmi.properties.launchPosition = 90
         addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'NUMPAD_9', 'PRESS')
+        kmi.properties.launchPosition = 90
+        addon_keymaps.append((km, kmi))
         kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'MINUS', 'PRESS')
+        kmi.properties.launchPosition = 100
+        addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new(FunscriptPositionButton.bl_idname, 'NUMPAD_PERIOD', 'PRESS')
         kmi.properties.launchPosition = 100
         addon_keymaps.append((km, kmi))
 

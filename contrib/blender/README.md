@@ -93,8 +93,8 @@ Shortcuts
 The following keyboard shortcuts are registered (focus must be on the Video
 Sequencer Editor):
 
-- `0-9`: Insert postion at 0% - 90% at current frame.
-- `-`  : Insert position at 100% at current frame.
+- `0-9`, `Numpad 0-9` : Insert postion at 0% - 90% at current frame.
+- `-`, `Numpad period` : Insert position at 100% at current frame.
 - `` ` ``  : Insert a copy of the previous stroke at current frame.
 - `=`  : Fill up until the current frame with copies of the previous stroke.
 
