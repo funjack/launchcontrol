@@ -192,7 +192,7 @@ func (m *LaunchManager) Dump() (protocol.TimedActions, error) {
 func (m *LaunchManager) Trace() <-chan protocol.Action {
 	m.Lock()
 	defer m.Unlock()
-	t := make(chan protocol.Action)
+	t := make(chan protocol.Action, 8)
 	m.tracers[t] = true
 	return t
 }
