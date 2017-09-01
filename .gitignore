@@ -16,6 +16,7 @@ coverage.txt
 playkiiroo
 launchcontrol
 contrib/kodi/*.zip
+contrib/blender/*.zip
 
 # Folders
 _obj

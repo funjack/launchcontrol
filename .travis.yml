@@ -23,6 +23,7 @@ before_deploy:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then GOOS=windows GOARCH=amd64 go build -o launchcontrol_windows_amd64.exe; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then GOOS=windows GOARCH=386 go build -o launchcontrol_windows_386.exe; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then GOOS=darwin GOARCH=amd64 go build -o launchcontrol_darwin_amd64; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make -C ./contrib/blender/ funscripting.zip; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make -C ./contrib/kodi/ script.service.launchcontrol.zip; fi
 deploy:
 - provider: releases
@@ -35,9 +36,9 @@ deploy:
   - launchcontrol_linux_arm
   - launchcontrol_windows_amd64.exe
   - launchcontrol_windows_386.exe
+  - contrib/blender/funscripting.zip
   - contrib/kodi/script.service.launchcontrol.zip
   - contrib/vlc/launchcontrol.lua
-  - contrib/blender/funscripting.py
   on:
     tags: true
     repo: funjack/launchcontrol

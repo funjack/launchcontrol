@@ -19,12 +19,12 @@ Installation
 ------------
 
 0. Download and install [Blender](https://www.blender.org/)
-1. Download the `funscripting.py` file
+1. Download `funscripting.zip` from the [releases](https://github.com/funjack/launchcontrol/releases) page
 2. Start Blender
 3. Open User Preferences (Ctrl+Alt+U)
 4. Click the Add-ons tab
 5. Click Install from File.
-6. Select the downloaded `funscripting.py`
+6. Select the downloaded `funscripting.zip`
 7. Mark the checkbox of `Funscripting Addon`
 8. Click `Save User Settings` to auto enable the addon on next startup
 
@@ -52,8 +52,8 @@ Click on the `add` menu button in the Sequencer:
 Select `Movie`. Browse to your movie file and open it:
 ![Movie](./doc/03-add-movie.jpg "Movie")
 
-Select the video strip by `right-clicking` on it. (You may see two strips, the
-top one represents the audio.):
+Select **only** the video strip by `right-clicking` on it. (So when you see two strips, the
+top one represents the audio and bottom video.):
 ![Select Strip](./doc/04-select-strip.jpg "Select Strip")
 
 ### Script movie
@@ -100,6 +100,17 @@ Sequencer Editor):
 
 Tips
 ----
+
+Generic Blender things:
+
+- The key `g` is the shortcut for grab, to move stuff around, while moving stuff
+  around press `x` or `y` to lock horizontal or vertical axis (handy if you
+  want to increase some values)
+- With the mouse in the graph editor the keys `[` and `]` will select all
+  keyframes (inserted points) before or after the current frame
+- With the mouse in the graph editor the `b` key will allow you to drag a box
+  to select stuff
+- `Up arrow` and `Down arrow` will move between keyframes (inserted points)
 
 When scripting, keep in mind that the Launch can only move up and down. That
 means the next position is **relative** to the previous one. This works great
