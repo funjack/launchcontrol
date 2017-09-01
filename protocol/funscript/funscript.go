@@ -25,21 +25,21 @@ const (
 // Script is the Funscript container type holding Launch data.
 type Script struct {
 	// Version of Launchscript
-	Version string
+	Version string `json:"version"`
 	// Inverted causes up and down movement to be flipped.
 	Inverted bool `json:"inverted,omitempty"`
 	// Range is the percentage of a full stroke to use.
 	Range Range `json:"range,omitempty"`
 	// Actions are the timed moves.
-	Actions []Action
+	Actions []Action `json:"actions"`
 }
 
 // Action is a move at a specific time.
 type Action struct {
 	// At time in milliseconds the action should fire.
-	At int64
+	At int64 `json:"at"`
 	// Pos is the place in percent to move to.
-	Pos int
+	Pos int `json:"pos"`
 }
 
 // Range in percent.
