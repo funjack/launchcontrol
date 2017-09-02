@@ -65,7 +65,7 @@ class FunscriptPanel(bpy.types.Panel):
         layout = self.layout
         row = layout.row(align=True)
         col = row.column(align=True)
-        last = {"frame":0, "value":0}
+        last = {"frame":1, "value":0}
         if keyframes is not None:
             for kf in reversed(keyframes):
                 frame = kf.co[0]
@@ -76,17 +76,21 @@ class FunscriptPanel(bpy.types.Panel):
                     last = {"frame":frame, "value":value}
                     break
         interval = frame_to_ms(scene.frame_current) - frame_to_ms(last["frame"])
-        icon = "FILE_TICK" if interval > 100 or last["frame"] == 0 else "ERROR"
+        icon = "FILE_TICK" if interval > 100 or last["frame"] == 1 else "ERROR"
         if interval > 1000:
             icon = "TIME"
         mindist = launch_distance(20, interval)
         maxdist = launch_distance(80, interval)
+
         col.label(text="Previous: %d" % last["value"])
         col = row.column(align=True)
-        col.label("Slowest: %d" % mindist)
+        col.operator("funscript.delete", text="Delete").frame=last["frame"]
         row = layout.row(align=True)
         col = row.column(align=True)
         col.label(text="Interval: %d ms" % interval, icon=icon)
+        row = layout.row(align=True)
+        col = row.column(align=True)
+        col.label("Slowest: %d" % mindist)
         col = row.column(align=True)
         col.label("Fastest: %d" % maxdist)
 
@@ -126,13 +130,32 @@ class FunscriptPositionButton(bpy.types.Operator):
     launchPosition = bpy.props.IntProperty()
 
     def execute(self, context):
-        print("inserting: %d" % self.launchPosition)
         scene = context.scene
         if len(context.selected_sequences) < 1:
             self.report({'ERROR_INVALID_CONTEXT'}, "No sequence selected.")
             return{'CANCELLED'}
         seq = context.selected_sequences[0]
         insert_position(seq, self.launchPosition, scene.frame_current)
+        scene.frame_set(scene.frame_current)
+        return{'FINISHED'}
+
+class FunscriptDeleteButton(bpy.types.Operator):
+    """Position delete button.
+
+    Button that deletes a Launch position from the currently selected Sequence.
+    """
+    bl_idname = "funscript.delete"
+    bl_label = "Delete"
+    bl_options = {'REGISTER', 'UNDO'}
+    frame = bpy.props.IntProperty()
+
+    def execute(self, context):
+        scene = context.scene
+        if len(context.selected_sequences) < 1:
+            self.report({'ERROR_INVALID_CONTEXT'}, "No sequence selected.")
+            return{'CANCELLED'}
+        seq = context.selected_sequences[0]
+        delete_position(seq, self.frame)
         scene.frame_set(scene.frame_current)
         return{'FINISHED'}
 
@@ -261,6 +284,10 @@ def insert_position(seq, position, frame):
     seq["launch"] = position
     seq.keyframe_insert(data_path='["launch"]', frame=frame)
 
+def delete_position(seq, frame):
+    """Deletes from seq a keyframe on frame."""
+    seq.keyframe_delete(data_path='["launch"]', frame=frame)
+
 def repeat_stroke(seq, frame_current):
     """Repeat the last stroke on the current frame"""
     stroke = last_stroke(seq, frame_current)
@@ -369,6 +396,7 @@ def launch_distance(speed, duration):
 
 def register():
     bpy.utils.register_class(FunscriptPositionButton)
+    bpy.utils.register_class(FunscriptDeleteButton)
     bpy.utils.register_class(FunscriptRepeatButton)
     bpy.utils.register_class(FunscriptFillButton)
     bpy.utils.register_class(FunscriptExport)
@@ -461,6 +489,7 @@ def unregister():
     bpy.utils.unregister_class(FunscriptExport)
     bpy.utils.unregister_class(FunscriptFillButton)
     bpy.utils.unregister_class(FunscriptRepeatButton)
+    bpy.utils.unregister_class(FunscriptDeleteButton)
     bpy.utils.unregister_class(FunscriptPositionButton)
 
 if __name__ == "__main__":
