@@ -152,7 +152,8 @@ class FunscriptRepeatButton(bpy.types.Operator):
             return{'CANCELLED'}
         seq = context.selected_sequences[0]
         lastframe = repeat_stroke(seq, scene.frame_current)
-        scene.frame_set(lastframe)
+        if lastframe is not None:
+            scene.frame_set(lastframe)
         return{'FINISHED'}
 
 class FunscriptFillButton(bpy.types.Operator):
@@ -172,7 +173,8 @@ class FunscriptFillButton(bpy.types.Operator):
             return{'CANCELLED'}
         seq = context.selected_sequences[0]
         lastframe = repeat_fill_stroke(seq, scene.frame_current)
-        scene.frame_set(lastframe)
+        if lastframe is not None:
+            scene.frame_set(lastframe)
         return{'FINISHED'}
 
 class FunscriptExport(bpy.types.Operator):
@@ -293,6 +295,8 @@ def fill_stroke(seq, stroke, frame_start, frame_end):
 def last_stroke(seq, since_frame):
     """Returns the last stroke since frame."""
     keyframes = launch_keyframes(seq.name)
+    if keyframes is None:
+        return
     stroke = []
     for kf in reversed(keyframes):
         frame = kf.co[0]
