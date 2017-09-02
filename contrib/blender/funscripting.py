@@ -32,7 +32,7 @@
 bl_info = {
     "name": "Funscripting Addon",
     "author": "Funjack",
-    "version": (0, 0, 5),
+    "version": (0, 0, 6),
     "location": "Sequencer",
     "description": "Script Launch haptics data and export as Funscript.",
     "category": "Sequencer",
@@ -283,7 +283,13 @@ def create_funscript(keyframes, inverted):
     script = []
     for kf in keyframes:
         time = frame_to_ms(int(kf.co[0]))
+        if time < 0:
+            continue
         value = int(kf.co[1])
+        if value < 0:
+            value = 0
+        elif value > 100:
+            value = 100
         script.append({"at": time, "pos": value})
     return {"version": "1.0", "inverted": inverted, "range": 100, "actions": script}
 
