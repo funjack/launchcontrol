@@ -57,9 +57,42 @@ class FunscriptPanel(bpy.types.Panel):
         return context.selected_sequences is not None \
                 and len(context.selected_sequences) == 1
 
-    def draw(self, context):
+    def limitinfo(self, context):
+        """Labels with hints of the limitations"""
+        scene = context.scene
+        seq = context.selected_sequences[0]
+        keyframes = launch_keyframes(seq.name)
         layout = self.layout
+        row = layout.row(align=True)
+        col = row.column(align=True)
+        last = {"frame":0, "value":0}
+        if keyframes is not None:
+            for kf in reversed(keyframes):
+                frame = kf.co[0]
+                value = kf.co[1]
+                if frame > scene.frame_current:
+                    continue
+                if frame < scene.frame_current:
+                    last = {"frame":frame, "value":value}
+                    break
+        interval = frame_to_ms(scene.frame_current) - frame_to_ms(last["frame"])
+        icon = "FILE_TICK" if interval > 100 or last["frame"] == 0 else "ERROR"
+        if interval > 1000:
+            icon = "TIME"
+        mindist = launch_distance(20, interval)
+        maxdist = launch_distance(80, interval)
+        col.label(text="Previous: %d" % last["value"])
+        col = row.column(align=True)
+        col.label("Slowest: %d" % mindist)
+        row = layout.row(align=True)
+        col = row.column(align=True)
+        col.label(text="Interval: %d ms" % interval, icon=icon)
+        col = row.column(align=True)
+        col.label("Fastest: %d" % maxdist)
 
+    def draw(self, context):
+        self.limitinfo(context)
+        layout = self.layout
         for x in [0, 10, 40, 70, 100]:
             row = layout.row(align=True)
             row.alignment = 'EXPAND'
@@ -321,6 +354,14 @@ def ms_to_frame(time):
     fps = scene.render.fps
     fps_base = scene.render.fps_base
     return round(time/1000/fps_base*fps+1)
+
+def launch_distance(speed, duration):
+    """Returns the launch movement distance for given speed and time in ms."""  
+    if speed <= 0 or duration <= 0:
+        return 0
+    time = pow(speed/25000, -0.95)
+    diff = time - duration
+    return 90 - int(diff/time*90)
 
 def register():
     bpy.utils.register_class(FunscriptPositionButton)

@@ -93,10 +93,37 @@ Shortcuts
 The following keyboard shortcuts are registered (focus must be on the Video
 Sequencer Editor):
 
-- `0-9`, `Numpad 0-9` : Insert postion at 0% - 90% at current frame.
+- `0-9`, `Numpad 0-9` : Insert position at 0% - 90% at current frame.
 - `-`, `Numpad period` : Insert position at 100% at current frame.
 - `` ` ``  : Insert a copy of the previous stroke at current frame.
 - `=`  : Fill up until the current frame with copies of the previous stroke.
+
+Hint label descriptions
+-----------------------
+
+In the funscripting panel there are a couple of hints displayed. These are just
+helpful hints, so feel free to ignore when you feel that's appropriate.
+
+- **Previous**: The position of the previous action.
+- **Interval**: Time in ms since the previous action, icons:
+   - *Warning triangle*: too soon, there is not enough time to technically send
+     the action.
+   - *Green check-mark*: sweet spot, the previous action will transition into
+     this one.
+   - *Clock*: there will be a 'pause' in the script, since the previous action
+     has already finished.
+- **Slowest**: The amount of distance to get the slowest move possible for the
+  current frame.
+- **Fastest**: The amount of distance to get the fastest move possible for the
+  current frame.
+
+The distance calculation for fastest and slowest is currently using
+Launchcontrol's 20-80 speed limits rules.
+
+### Example
+
+If previous position was 20, and the slowest hint gives 10. Inserting either 10
+or 30 will result in the slowest move in the specified direction.
 
 Tips
 ----
