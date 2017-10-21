@@ -28,7 +28,7 @@ import (
 
 var (
 	listen   = flag.String("listen", "127.0.0.1:6969", "listen address")
-	buttplug = flag.String("buttplug", "", "buttplug server websocket address (experimental)")
+	buttplug = flag.String("buttplug", "", "buttplug.io websocket server address (eg ws://localhost:12345/buttplug)")
 	ca       = flag.String("ca", "", "certificate authority in PEM format")
 	insecure = flag.Bool("insecure", false, "skip certificate verification")
 	noact    = flag.Bool("noact", false, "simulate launch on console")
