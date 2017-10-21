@@ -26,6 +26,11 @@ scripttypes = [
             "mediaType" : "text/prs.kiiroo",
         },
         {
+            "name"      : "feelme",
+            "extensions": ["meta"],
+            "mediaType" : "application/prs.kiiroo+json",
+        },
+        {
             "name"      : "realtouch",
             "extensions": ["realtouch", "ott"],
             "mediaType" : "text/prs.realtouch",

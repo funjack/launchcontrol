@@ -43,7 +43,7 @@ local clientConfig = {
 
 function descriptor()
   return {
-    title = "Launchcontrol 0.0.3",
+    title = "Launchcontrol 0.0.4",
     version = "0.0.3",
     author = "Funjack",
     url = "https://github.com/funjack/launchcontrol/",
@@ -288,6 +288,11 @@ scriptTypes = {
     name = "kiiroo",
     extensions = {"kiiroo"},
     mediaType = "text/prs.kiiroo",
+  },
+  {
+    name = "feelme",
+    extensions = {"meta"},
+    mediaType = "application/prs.kiiroo+json",
   },
   {
     name = "realtouch",
