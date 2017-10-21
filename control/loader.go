@@ -47,6 +47,7 @@ var Loaders = []Loader{
 	{
 		Loader: protocol.LoaderFunc(kiiroo.LoadJSON),
 		ContentTypes: []string{
+			"application/prs.kiiroo+json",
 			"application/json",
 		},
 	},

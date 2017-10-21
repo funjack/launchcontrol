@@ -2,6 +2,7 @@ package funscript
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -71,6 +72,9 @@ func (l Loader) Load(r io.Reader) (protocol.Player, error) {
 	err := d.Decode(&s)
 	if err != nil {
 		return p, err
+	}
+	if len(s.Actions) == 0 {
+		return p, errors.New("empty script")
 	}
 	log.Printf("Loading Funscript: %s", l)
 	var stats Stats

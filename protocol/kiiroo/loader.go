@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"log"
 	"strings"
 
 	"github.com/funjack/launchcontrol/protocol"
@@ -14,6 +15,9 @@ import (
 func Load(r io.Reader) (protocol.Player, error) {
 	p := NewScriptPlayer()
 	err := p.Load(r)
+	if err == nil {
+		log.Printf("Kiiroo stats: %d actions", len(p.Script))
+	}
 	return p, err
 }
 

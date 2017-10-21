@@ -43,14 +43,25 @@ func TestLoadJSON(t *testing.T) {
 	var inputJson = []string{`{
 	"text": "{1.00:4,2.50:1}"
 }`,
+		`{
+	"text": " {1.00:4,2.50:1}"
+}`,
 	}
 	for i, c := range inputJson {
 		p, err := LoadJSON(bytes.NewBufferString(c))
 		if err != nil {
 			t.Errorf("case %d: %v", i, err)
 		}
-		if _, ok := p.(*ScriptPlayer); !ok {
+		sp, ok := p.(*ScriptPlayer)
+		if !ok {
 			t.Errorf("case %d: did not return a kiiroo player", i)
+		}
+		actions, err := sp.Dump()
+		if err != nil {
+			t.Errorf("case %d: could not dump script", i)
+		}
+		if len(actions) < 2 {
+			t.Errorf("case %d: not enough actions generated", i)
 		}
 	}
 }
