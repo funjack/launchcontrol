@@ -1,4 +1,4 @@
-# Launchcontrol (Alpha)
+# Launchcontrol
 
 [![GoDoc](https://godoc.org/github.com/funjack/launchcontrol?status.svg)](https://godoc.org/github.com/funjack/launchcontrol)
 [![Go Report Card](https://goreportcard.com/badge/github.com/funjack/launchcontrol)](https://goreportcard.com/report/github.com/funjack/launchcontrol)
@@ -15,14 +15,17 @@ The main platform for Launchcontrol is Linux, but it has been successfully
 tested on Mac OS X. Works great on a Raspberry Pi with
 [LibreELEC](https://libreelec.tv/) using the Kodi addon.
 
-Windows versions (**experimental!**) require (at time of writing, yet to be
-released) [Buttplug](https://buttplug.io/) Websocket server. Check out the
-Metafetish [blog](https://www.metafetish.com/) and
+Windows versions **require** [Buttplug.io](https://buttplug.io/) Websocket
+server.  Information on how to install and run Buttplug.io Websocket server can
+be found
+[here](https://metafetish.club/t/tutorial-buttplug-c-app-suite-0-1-0/80).
+Check out the Metafetish [blog](https://www.metafetish.com/) and
 [forums](https://metafetish.club/) for the latest status.
 
-The Kodi and VLC addons should work on all platforms (Linux, Mac and Windows.)
+The Kodi and VLC addons work on all platforms (Linux, Mac and Windows.) Kodi's
+addon also works with their Android versions.
 
-Requires a Launch with (at least) firmware 1.2.
+The Launch's firmware needs to be 1.2 (or higher.)
 
 ## Script formats
 
@@ -42,40 +45,81 @@ Create your own Funscripts using the [Blender addon](https://github.com/funjack/
 Check the [releases](https://github.com/funjack/launchcontrol/releases) page
 for the latest binary downloads.
 
-| Filename                           | Description                         |
-| ---------------------------------- | ----------------------------------- |
-| `launchcontrol_linux_amd64`        | Linux (64-bit)                      |
-| `launchcontrol_linux_386`          | Linux (32-bit)                      |
-| `launchcontrol_darwin_amd64`       | Mac OS X                            |
-| `launchcontrol_linux_arm`          | Linux ARM (Raspberry Pi)            |
-| `launchcontrol_windows_amd64`      | Windows (64-bit) **Buttplug only!** |
-| `launchcontrol_windows_386`        | Windows (32-bit) **Buttplug only!** |
-| `script.service.launchcontrol.zip` | Kodi Addon                          |
-| `launchcontrol.lua`                | VLC Extension                       |
-| `funscripting.zip`                  | [Blender addon](https://github.com/funjack/launchcontrol/tree/master/contrib/blender) |
+| Filename                           | Description                 |
+| ---------------------------------- | ----------------------------|
+| `launchcontrol_linux_amd64`        | Linux (64-bit)              |
+| `launchcontrol_linux_386`          | Linux (32-bit)              |
+| `launchcontrol_darwin_amd64`       | Mac OS X                    |
+| `launchcontrol_linux_arm`          | Linux ARM (Raspberry Pi)    |
+| `launchcontrol_windows_amd64`      | Windows (64-bit) (see note) |
+| `launchcontrol_windows_386`        | Windows (32-bit) (see note) |
+| `script.service.launchcontrol.zip` | Kodi Addon                  |
+| `launchcontrol.lua`                | VLC Extension               |
+| `funscripting.zip`                 | [Blender addon](https://github.com/funjack/launchcontrol/tree/master/contrib/blender) |
 
-## Build
-
-```sh
-go get ./...
-go build
-sudo setcap 'cap_net_raw,cap_net_admin=eip' ./launchcontrol
-```
+**NOTE:** Windows versions of Launchcontrol do not have native Bluetooth
+support and require [Buttplug.io](https://buttplug.io/) Websocket server.
+Information on how to install and run Buttplug.io Websocket server can be found
+[here](https://metafetish.club/t/tutorial-buttplug-c-app-suite-0-1-0/80). Check
+out the Metafetish [blog](https://www.metafetish.com/) and
+[forums](https://metafetish.club/) for the latest status.
 
 ## Usage
 
-### Start using native BLE
+```
+Usage of launchcontrol:
+  -buttplug string
+    	buttplug server websocket address
+  -ca string
+    	certificate authority in PEM format
+  -insecure
+    	skip certificate verification
+  -licenses
+    	show licenses
+  -listen string
+    	listen address (default "127.0.0.1:6969")
+  -noact
+    	simulate launch on console
+  -version
+    	show version
+```
+
+### Start using native Bluetooth (BLE)
+
 ```sh
 # Start server (listening on localhost:6969 by default)
 ./launchcontrol
 ```
 
-### Start using Buttplug Websocket Server (experimental!)
+### Start using Buttplug.io Websocket Server
+
+Buttplug.io can take care of communicating with BLE toys. This is the only way for
+Launchcontrol to communicate with a Launch on Windows.
+
+#### With TLS
+
+By default Buttplug is running with TLS enabled using a self-signed
+certificate. (Note that the certificate is stored in PFX format and needs to be
+converted to PEM before Launchcontrol can use it.)
+
+```sh
+./launchcontrol -ca certificate.pem -buttplug wss://localhost:12345/buttplug
+```
+
+Alternatively the certificate validation can be skipped:
+
+```sh
+./launchcontrol -insecure -buttplug wss://localhost:12345/buttplug
+```
+
+#### Without TLS
+
 ```sh
 ./launchcontrol -buttplug ws://localhost:12345/buttplug
 ```
 
-### Execute commands on HTTP endpoint usig cURL
+### Execute commands on HTTP endpoint using cURL
+
 ```sh
 # Load and play script
 curl -XPOST -H "Content-Type: text/prs.kiiroo" --data-ascii \
@@ -90,11 +134,13 @@ curl http://localhost:6969/v1/skip\?p=1m3s
 curl http://localhost:6969/v1/stop
 # Start playing last loaded script
 curl http://localhost:6969/v1/play
+# Dump loaded script raw data:
+curl http://localhost:6969/v1/dump
 ```
 
 ## Kodi Integration
 
-The Launchcontrol Kodi service addon connects to a local Launchserver and auto
+The Launchcontrol Kodi service addon connects to a local Launchcontrol server and auto
 loads scripts and synchronizes playback, taking into account actions like
 pausing and seeking.
 
@@ -109,7 +155,7 @@ on remote sources like SMB or HTTP servers will work.
 **Movie/script pairing example:**
 
 - `/my movies/title.mp4`
-- `/my movies/title.kiiroo`
+- `/my movies/title.funscript`
 
 ### Install
 
@@ -129,9 +175,9 @@ are not using the default port, the address can be changed in the add-ons
 ## VLC Integration
 
 VLC extension for Launchcontrol loads script from the local machine into a
-Launchcontrol server and plays them in sync with a video. Pairing works the
-same as for the Kodi addon, just place the script file next to the video using
-the same base filename.
+Launchcontrol server to play them in sync with a video. Pairing works the same
+as for the Kodi addon, just place the script file next to the video using the
+same base filename.
 
 ![VLC Screenshot](contrib/vlc/screenshot001.jpg "VLC Configuration")
 
@@ -146,13 +192,23 @@ must be enabled every time VLC is restarted by clicking `view` `->`
 `Launchcontrol`. See [VLC Extension README](/contrib/vlc/README.md) for more
 details on the extension.
 
-### Raspberry Pi v2/v3 with LibreELEC
+## Build
+
+```sh
+go get ./...
+go build
+sudo setcap 'cap_net_raw,cap_net_admin=eip' ./launchcontrol
+```
+
+## Raspberry Pi v2/v3 with LibreELEC
 
 Make sure Bluetooth is **disabled** in the LibreELEC
 [Services](https://wiki.libreelec.tv/index.php?title=LibreELEC_Settings#tab=Services)
 tab.
 
-Build Launchserver for [arm](https://golang.org/doc/install/source#environment):
+Build Launchcontrol server for
+[arm](https://golang.org/doc/install/source#environment):
+
 ```sh
 go get ./...
 GOARCH=arm GOARM=7 go build
