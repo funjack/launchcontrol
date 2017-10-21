@@ -137,7 +137,6 @@ curl http://localhost:6969/v1/play
 # Dump loaded script raw data:
 curl http://localhost:6969/v1/dump
 ```
-```
 
 ## Kodi Integration
 
@@ -156,7 +155,7 @@ on remote sources like SMB or HTTP servers will work.
 **Movie/script pairing example:**
 
 - `/my movies/title.mp4`
-- `/my movies/title.kiiroo`
+- `/my movies/title.funscript`
 
 ### Install
 
