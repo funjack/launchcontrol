@@ -49,11 +49,19 @@ func LoadText(r io.Reader) (protocol.Player, error) {
 func LoadJSON(r io.Reader) (protocol.Player, error) {
 	var format struct {
 		Text string `json:"text"`
+		Subs struct {
+			Text string `json:"text"`
+		} `json:"subs"`
 	}
 	d := json.NewDecoder(r)
 	err := d.Decode(&format)
 	if err != nil {
 		return nil, err
 	}
-	return Load(bytes.NewBufferString(format.Text))
+	if format.Text != "" {
+		return Load(bytes.NewBufferString(format.Text))
+	} else if format.Subs.Text != "" {
+		return Load(bytes.NewBufferString(format.Subs.Text))
+	}
+	return nil, ErrNoEvents
 }

@@ -13,6 +13,8 @@ import (
 var (
 	// ErrEventFormat is the error returned the event could not be parsed.
 	ErrEventFormat = errors.New("invalid event format")
+	// ErrNoEvents is the error returned when no events could be detected.
+	ErrNoEvents = errors.New("no events found")
 )
 
 // Algorithm interface converts Kiiroo events into TimedActions.
@@ -56,6 +58,22 @@ func (e *Event) UnmarshalText(text []byte) error {
 
 // Events is an ordered series of Event objects.
 type Events []Event
+
+// Len is the number of elements in the collection.
+func (es Events) Len() int {
+	return len(es)
+}
+
+// Less reports whether the element with
+// index i should sort before the element with index j.
+func (es Events) Less(i, j int) bool {
+	return es[i].Time < es[j].Time
+}
+
+// Swap swaps the elements with indexes i and j.
+func (es Events) Swap(i, j int) {
+	es[i], es[j] = es[j], es[i]
+}
 
 // MarshalText implements the encoding.TextMarshaler interface.
 func (es Events) MarshalText() (text []byte, err error) {

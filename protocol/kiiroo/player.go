@@ -3,6 +3,7 @@ package kiiroo
 import (
 	"bytes"
 	"io"
+	"sort"
 
 	"github.com/funjack/launchcontrol/protocol"
 )
@@ -32,6 +33,7 @@ func (k *ScriptPlayer) Load(r io.Reader) error {
 	if err != nil {
 		return err
 	}
+	sort.Sort(es)
 
 	k.Script = k.alg.Actions(es)
 	return nil

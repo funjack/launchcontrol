@@ -46,6 +46,7 @@ func TestLoadJSON(t *testing.T) {
 		`{
 	"text": " {1.00:4,2.50:1}"
 }`,
+		`{"subs":{"text":" {1.00:4,2.50:1}"}}`,
 	}
 	for i, c := range inputJson {
 		p, err := LoadJSON(bytes.NewBufferString(c))
