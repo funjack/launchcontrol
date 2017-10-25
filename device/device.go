@@ -33,7 +33,7 @@ type LaunchManager struct {
 	wg     sync.WaitGroup
 	player protocol.Player
 
-	tracers map[chan protocol.Action]bool
+	tracers sync.Map
 
 	playingMux sync.Mutex
 	playing    bool
@@ -42,8 +42,7 @@ type LaunchManager struct {
 // NewLaunchManager creates a new manager for the given Launch.
 func NewLaunchManager(l golaunch.Launch) *LaunchManager {
 	lm := &LaunchManager{
-		launch:  l,
-		tracers: make(map[chan protocol.Action]bool),
+		launch: l,
 	}
 	lm.launch.HandleDisconnect(func() {
 		lm.Lock()
@@ -108,27 +107,31 @@ func (m *LaunchManager) Play() error {
 		m.playing = true
 		m.playingMux.Unlock()
 		m.wg.Add(1)
-		go func() {
-			for a := range m.player.Play() {
-				m.launch.Move(a.Position, a.Speed)
-				for t := range m.tracers {
-					select {
-					case t <- a:
-					default:
-						close(t)
-						m.Lock()
-						delete(m.tracers, t)
-						m.Unlock()
-					}
-				}
-			}
-			m.playingMux.Lock()
-			m.playing = false
-			m.playingMux.Unlock()
-			m.wg.Done()
-		}()
+		go m.playroutine()
 	}
 	return nil
+}
+
+// playroutine will send actions from the script player to the launch.
+func (m *LaunchManager) playroutine() {
+	for a := range m.player.Play() {
+		m.launch.Move(a.Position, a.Speed)
+		m.tracers.Range(func(key interface{}, value interface{}) bool {
+			if t, ok := key.(chan protocol.Action); ok {
+				select {
+				case t <- a:
+				default:
+					close(t)
+					m.tracers.Delete(t)
+				}
+			}
+			return true
+		})
+	}
+	m.playingMux.Lock()
+	m.playing = false
+	m.playingMux.Unlock()
+	m.wg.Done()
 }
 
 // Stop will halt playback and reset the scriptplayer.
@@ -199,7 +202,7 @@ func (m *LaunchManager) Dump() (protocol.TimedActions, error) {
 // Launch.
 func (m *LaunchManager) Trace() <-chan protocol.Action {
 	t := make(chan protocol.Action, 8)
-	m.tracers[t] = true
+	m.tracers.Store(t, true)
 	return t
 }
 
