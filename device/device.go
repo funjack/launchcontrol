@@ -27,12 +27,16 @@ var ConnectionTimeout = time.Second * 10
 type LaunchManager struct {
 	sync.Mutex
 
-	launch  golaunch.Launch
-	player  protocol.Player
+	launch      golaunch.Launch
+	isConnected bool
+
+	wg     sync.WaitGroup
+	player protocol.Player
+
 	tracers map[chan protocol.Action]bool
 
-	isPlaying   bool
-	isConnected bool
+	playingMux sync.Mutex
+	playing    bool
 }
 
 // NewLaunchManager creates a new manager for the given Launch.
@@ -44,11 +48,10 @@ func NewLaunchManager(l golaunch.Launch) *LaunchManager {
 	lm.launch.HandleDisconnect(func() {
 		lm.Lock()
 		defer lm.Unlock()
-
 		// TODO implement nice reconnect handling
 		lm.isConnected = false
 		lm.player.Stop()
-		lm.isPlaying = false
+		lm.wg.Wait()
 	})
 
 	return lm
@@ -60,10 +63,11 @@ func (m *LaunchManager) SetScriptPlayer(p protocol.Player) error {
 	m.Lock()
 	defer m.Unlock()
 
-	if m.isPlaying {
+	if m.isPlaying() {
 		if err := m.player.Stop(); err != nil {
 			return err
 		}
+		m.wg.Wait()
 	}
 	m.player = p
 	return nil
@@ -91,7 +95,7 @@ func (m *LaunchManager) Play() error {
 	m.Lock()
 	defer m.Unlock()
 
-	if m.isPlaying {
+	if m.isPlaying() {
 		return nil
 	}
 
@@ -100,7 +104,10 @@ func (m *LaunchManager) Play() error {
 	}
 
 	if m.player != nil {
-		m.isPlaying = true
+		m.playingMux.Lock()
+		m.playing = true
+		m.playingMux.Unlock()
+		m.wg.Add(1)
 		go func() {
 			for a := range m.player.Play() {
 				m.launch.Move(a.Position, a.Speed)
@@ -115,9 +122,10 @@ func (m *LaunchManager) Play() error {
 					}
 				}
 			}
-			m.Lock()
-			m.isPlaying = false
-			m.Unlock()
+			m.playingMux.Lock()
+			m.playing = false
+			m.playingMux.Unlock()
+			m.wg.Done()
 		}()
 	}
 	return nil
@@ -128,7 +136,7 @@ func (m *LaunchManager) Stop() error {
 	m.Lock()
 	defer m.Unlock()
 
-	if m.isPlaying {
+	if m.isPlaying() {
 		return m.player.Stop()
 	}
 	return nil
@@ -139,7 +147,7 @@ func (m *LaunchManager) Pause() error {
 	m.Lock()
 	defer m.Unlock()
 
-	if m.isPlaying {
+	if m.isPlaying() {
 		if pp, ok := m.player.(protocol.Pausable); ok {
 			return pp.Pause()
 		}
@@ -153,7 +161,7 @@ func (m *LaunchManager) Resume() error {
 	m.Lock()
 	defer m.Unlock()
 
-	if m.isPlaying {
+	if m.isPlaying() {
 		if pp, ok := m.player.(protocol.Pausable); ok {
 			return pp.Resume()
 		}
@@ -167,7 +175,7 @@ func (m *LaunchManager) Skip(p time.Duration) error {
 	m.Lock()
 	defer m.Unlock()
 
-	if m.isPlaying {
+	if m.isPlaying() {
 		if pp, ok := m.player.(protocol.Skippable); ok {
 			return pp.Skip(p)
 		}
@@ -190,9 +198,23 @@ func (m *LaunchManager) Dump() (protocol.TimedActions, error) {
 // Trace returns a channel that receives the same actions as are send to the
 // Launch.
 func (m *LaunchManager) Trace() <-chan protocol.Action {
-	m.Lock()
-	defer m.Unlock()
 	t := make(chan protocol.Action, 8)
 	m.tracers[t] = true
 	return t
+}
+
+// isPlaying returns true if the loaded scriptplayer is playing.
+func (m *LaunchManager) isPlaying() bool {
+	m.playingMux.Lock()
+	defer m.playingMux.Unlock()
+	return m.playing
+}
+
+// WaitUntilStopped will return a empty struct on the done channel when the
+// player is stopped.
+func (m *LaunchManager) WaitUntilStopped(done chan<- struct{}) {
+	go func() {
+		m.wg.Wait()
+		done <- struct{}{}
+	}()
 }

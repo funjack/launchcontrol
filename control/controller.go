@@ -48,6 +48,7 @@ func (c *Controller) PlayHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if err := c.manager.SetScriptPlayer(k); err != nil {
+			log.Printf("Error initializing player: %s\n", err)
 			handleManagerError(w, err)
 			return
 		}
