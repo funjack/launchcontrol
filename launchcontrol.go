@@ -90,7 +90,14 @@ func main() {
 		<-sig
 		log.Println("Shutting down...")
 		l.Disconnect()
-		time.Sleep(time.Second * 2)
+		var done = make(chan struct{})
+		lm.WaitUntilStopped(done)
+		select {
+		case <-done:
+			log.Println("Shutdown complete.")
+		case <-time.After(time.Second * 2):
+			log.Println("Forcefully shutdown.")
+		}
 		os.Exit(0)
 	}()
 

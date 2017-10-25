@@ -19,6 +19,9 @@ func (f launchMock) Connect(ctx context.Context) error {
 }
 func (f launchMock) Disconnect() {
 	log.Printf("Disconnect called")
+	if f.DisFunc != nil {
+		f.DisFunc()
+	}
 }
 func (f *launchMock) HandleDisconnect(fnc func()) {
 	log.Printf("HandleFunc called")
