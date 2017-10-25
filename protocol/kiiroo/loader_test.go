@@ -40,7 +40,7 @@ onyx=1.00,4;2.50,1;8.12,3` + "\r\r" + `
 }
 
 func TestLoadJSON(t *testing.T) {
-	var inputJson = []string{`{
+	var inputJSON = []string{`{
 	"text": "{1.00:4,2.50:1}"
 }`,
 		`{
@@ -48,7 +48,7 @@ func TestLoadJSON(t *testing.T) {
 }`,
 		`{"subs":{"text":" {1.00:4,2.50:1}"}}`,
 	}
-	for i, c := range inputJson {
+	for i, c := range inputJSON {
 		p, err := LoadJSON(bytes.NewBufferString(c))
 		if err != nil {
 			t.Errorf("case %d: %v", i, err)

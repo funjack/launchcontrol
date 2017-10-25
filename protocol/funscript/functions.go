@@ -1,12 +1,9 @@
 package funscript
 
 import (
-	"errors"
 	"math"
 	"time"
 )
-
-var ErrOutOfRange = errors.New("out of range")
 
 // Speed returns the speed (in percent) to move the given distance (in percent)
 // in the given duration.
