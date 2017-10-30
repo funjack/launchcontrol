@@ -38,7 +38,7 @@ Supported haptic script formats:
 | [Kiiroo](https://godoc.org/github.com/funjack/launchcontrol/protocol/kiiroo) | `text/prs.kiiroo` | `.kiiroo` |
 | [Kiiroo (Feel-Me/VR)](https://godoc.org/github.com/funjack/launchcontrol/protocol/kiiroo) | `application/prs.kiiroo+json` | `.meta` |
 
-Create your own Funscripts using the [Blender addon](https://github.com/funjack/launchcontrol/tree/master/contrib/blender).
+Create your own Funscripts using the [Funscripting Blender addon](https://github.com/funjack/funscripting/tree/master/).
 
 ## Downloads
 
@@ -55,7 +55,6 @@ for the latest binary downloads.
 | `launchcontrol_windows_386`        | Windows (32-bit) (see note) |
 | `script.service.launchcontrol.zip` | Kodi Addon                  |
 | `launchcontrol.lua`                | VLC Extension               |
-| `funscripting.zip`                 | [Blender addon](https://github.com/funjack/launchcontrol/tree/master/contrib/blender) |
 
 **NOTE:** Windows versions of Launchcontrol do not have native Bluetooth
 support and require [Buttplug.io](https://buttplug.io/) Websocket server.
