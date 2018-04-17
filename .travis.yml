@@ -3,7 +3,7 @@ os:
 - linux
 - osx
 go:
-- 1.9
+- 1.10
 install:
 - go get github.com/kardianos/govendor
 - go install github.com/kardianos/govendor
