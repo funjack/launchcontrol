@@ -5,8 +5,8 @@
 		{
 			"checksumSHA1": "7DxViusFRJ7UPH0jZqYatwDrOkY=",
 			"path": "github.com/elazarl/go-bindata-assetfs",
-			"revision": "30f82fa23fd844bd5bb1e5f216db87fd77b5eb43",
-			"revisionTime": "2017-02-27T21:27:28Z"
+			"revision": "38087fe4dafb822e541b3f7955075cc1c30bd294",
+			"revisionTime": "2018-02-23T16:03:09Z"
 		},
 		{
 			"checksumSHA1": "Zm0Wa9fN1LTbmXIPfiJT/ysasAQ=",
@@ -27,76 +27,76 @@
 			"revisionTime": "2017-10-21T19:13:23Z"
 		},
 		{
-			"checksumSHA1": "spt5hE6VmUrBritGk8a0zjXN+ls=",
+			"checksumSHA1": "tnrWxeW4DIka8eJ8Ql5+4zgifuQ=",
 			"path": "github.com/go-ble/ble",
-			"revision": "077870275f0ae179d6cf9d02ce5d07cd848d1a64",
-			"revisionTime": "2017-12-16T11:20:25Z"
+			"revision": "721d2405efb7924028deef3b0105219209fba482",
+			"revisionTime": "2018-04-04T09:27:36Z"
 		},
 		{
-			"checksumSHA1": "ppsNUbx2oLDAi3RgHo9mEoJErZg=",
+			"checksumSHA1": "qpmy24REyeqJcyi1SjKrk4TmpMc=",
 			"path": "github.com/go-ble/ble/darwin",
-			"revision": "077870275f0ae179d6cf9d02ce5d07cd848d1a64",
-			"revisionTime": "2017-12-16T11:20:25Z"
+			"revision": "721d2405efb7924028deef3b0105219209fba482",
+			"revisionTime": "2018-04-04T09:27:36Z"
 		},
 		{
-			"checksumSHA1": "RWsIg4alHaNWA9wPUrw33YBtz7E=",
+			"checksumSHA1": "ziHt09gWhSGfIAFWJ0lsEMkSf20=",
 			"path": "github.com/go-ble/ble/linux",
-			"revision": "077870275f0ae179d6cf9d02ce5d07cd848d1a64",
-			"revisionTime": "2017-12-16T11:20:25Z"
+			"revision": "721d2405efb7924028deef3b0105219209fba482",
+			"revisionTime": "2018-04-04T09:27:36Z"
 		},
 		{
-			"checksumSHA1": "8jEf7kh3Qzq3ETwhWuBHrUtudx0=",
+			"checksumSHA1": "4RAl/OkRVkxvcNkw6fgTaRMhdT0=",
 			"path": "github.com/go-ble/ble/linux/adv",
-			"revision": "077870275f0ae179d6cf9d02ce5d07cd848d1a64",
-			"revisionTime": "2017-12-16T11:20:25Z"
+			"revision": "721d2405efb7924028deef3b0105219209fba482",
+			"revisionTime": "2018-04-04T09:27:36Z"
 		},
 		{
 			"checksumSHA1": "fU8bJkGAv5ZIyPjsB+5ZqM9yX+0=",
 			"path": "github.com/go-ble/ble/linux/att",
-			"revision": "077870275f0ae179d6cf9d02ce5d07cd848d1a64",
-			"revisionTime": "2017-12-16T11:20:25Z"
+			"revision": "721d2405efb7924028deef3b0105219209fba482",
+			"revisionTime": "2018-04-04T09:27:36Z"
 		},
 		{
-			"checksumSHA1": "N+0rNCQ50cH/drj3lBFJGA/cUlI=",
+			"checksumSHA1": "90txVvclEyzrEBokPpzgmd46jo0=",
 			"path": "github.com/go-ble/ble/linux/gatt",
-			"revision": "077870275f0ae179d6cf9d02ce5d07cd848d1a64",
-			"revisionTime": "2017-12-16T11:20:25Z"
+			"revision": "721d2405efb7924028deef3b0105219209fba482",
+			"revisionTime": "2018-04-04T09:27:36Z"
 		},
 		{
-			"checksumSHA1": "hJaSx96bqudb7SiS+p8EhZ6jzqo=",
+			"checksumSHA1": "IzaBQIrAjWACraogINOhv/p5dss=",
 			"path": "github.com/go-ble/ble/linux/hci",
-			"revision": "077870275f0ae179d6cf9d02ce5d07cd848d1a64",
-			"revisionTime": "2017-12-16T11:20:25Z"
+			"revision": "721d2405efb7924028deef3b0105219209fba482",
+			"revisionTime": "2018-04-04T09:27:36Z"
 		},
 		{
 			"checksumSHA1": "PiDNfwOOKUqF1wAJJ1K4P853Zj8=",
 			"path": "github.com/go-ble/ble/linux/hci/cmd",
-			"revision": "077870275f0ae179d6cf9d02ce5d07cd848d1a64",
-			"revisionTime": "2017-12-16T11:20:25Z"
+			"revision": "721d2405efb7924028deef3b0105219209fba482",
+			"revisionTime": "2018-04-04T09:27:36Z"
 		},
 		{
 			"checksumSHA1": "8muXD+QQ8BpPZU3v7eMNMvUaQpI=",
 			"path": "github.com/go-ble/ble/linux/hci/evt",
-			"revision": "077870275f0ae179d6cf9d02ce5d07cd848d1a64",
-			"revisionTime": "2017-12-16T11:20:25Z"
+			"revision": "721d2405efb7924028deef3b0105219209fba482",
+			"revisionTime": "2018-04-04T09:27:36Z"
 		},
 		{
 			"checksumSHA1": "vcUR6mem+yZc4gMEYApTpciVb7I=",
 			"path": "github.com/go-ble/ble/linux/hci/socket",
-			"revision": "077870275f0ae179d6cf9d02ce5d07cd848d1a64",
-			"revisionTime": "2017-12-16T11:20:25Z"
+			"revision": "721d2405efb7924028deef3b0105219209fba482",
+			"revisionTime": "2018-04-04T09:27:36Z"
 		},
 		{
-			"checksumSHA1": "QWnVAOSYoXj3fXNLpQCMzH8kAL0=",
+			"checksumSHA1": "GKI0C5VBjSEutOnBQsZv4gXHnrk=",
 			"path": "github.com/gorilla/websocket",
-			"revision": "d965e9adc66deebadcc7d0c6c7598e2a4baa7838",
-			"revisionTime": "2017-12-28T15:29:59Z"
+			"revision": "cd94665a654c1ec903896f2902573b46dd21baa7",
+			"revisionTime": "2018-04-16T03:20:28Z"
 		},
 		{
-			"checksumSHA1": "C8GaEQYPqB4ECXc6NYjSxZuUbSI=",
+			"checksumSHA1": "SEnjvwVyfuU2xBaOfXfwPD5MZqk=",
 			"path": "github.com/mattn/go-colorable",
-			"revision": "586e6dcca296d085100876beb6dbf02287a247f7",
-			"revisionTime": "2017-12-29T09:55:07Z"
+			"revision": "efa589957cd060542a26d2dd7832fd6a6c6c3ade",
+			"revisionTime": "2018-03-10T13:32:14Z"
 		},
 		{
 			"checksumSHA1": "w5RcOnfv5YDr3j2bd1YydkPiZx4=",
@@ -117,22 +117,22 @@
 			"revisionTime": "2016-10-27T14:08:23Z"
 		},
 		{
-			"checksumSHA1": "xCv4GBFyw07vZkVtKF/XrUnkHRk=",
+			"checksumSHA1": "ljd3FhYRJ91cLZz3wsH9BQQ2JbA=",
 			"path": "github.com/pkg/errors",
-			"revision": "e881fd58d78e04cf6d0de1217f8707c8cc2249bc",
-			"revisionTime": "2017-12-16T07:03:16Z"
+			"revision": "816c9085562cd7ee03e7f8188a1cfd942858cded",
+			"revisionTime": "2018-03-11T21:45:15Z"
 		},
 		{
 			"checksumSHA1": "1ya4UtselIOmBQb4ygCm5nQLvAc=",
 			"path": "github.com/raff/goble/xpc",
-			"revision": "591010bb87c136ee390f8f20529039fea824f737",
-			"revisionTime": "2017-11-11T00:57:34Z"
+			"revision": "efeac611681b89806d673dfbd8fc1690ca6bd093",
+			"revisionTime": "2018-02-08T22:49:17Z"
 		},
 		{
-			"checksumSHA1": "7g7MoM8YOohbIhWWAbOyfJkN5r8=",
+			"checksumSHA1": "7L57WVVjGdY2gB/Durw+qZR7kV8=",
 			"path": "golang.org/x/sys/unix",
-			"revision": "a3f2cbd54cf5dfe3fbaccf76375fdb12f67654c8",
-			"revisionTime": "2018-01-04T08:34:00Z"
+			"revision": "b126b21c05a91c856b027c16779c12e3bf236954",
+			"revisionTime": "2018-04-16T10:06:24Z"
 		}
 	],
 	"rootPath": "github.com/funjack/launchcontrol"
