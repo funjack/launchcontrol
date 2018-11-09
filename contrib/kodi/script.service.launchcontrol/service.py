@@ -36,7 +36,7 @@ class PlayerMonitor(xbmc.Player) :
                 # where playback is resumed, and it takes a while for the
                 # player to actually update getTime to the resumed location.
                 waitTimeSec = 1
-                for i in xrange(3):
+                for i in xrange(1, 4):
                     eventTime = self.getTime()
                     xbmc.sleep(waitTimeSec*1000)
                     # Skip if the difference is larger then waitTimeSec
